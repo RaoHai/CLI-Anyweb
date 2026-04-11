@@ -32,8 +32,7 @@ PKG_README="${PACKAGE_DIR}/README.md"
 SKILL_MD="${PACKAGE_DIR}/skills/SKILL.md"
 TEST_INIT="${TEST_DIR}/__init__.py"
 TEST_MD="${TEST_DIR}/TEST.md"
-SITE_PROFILE="${REF_DIR}/${SITE_SLUG}.site-profile.md"
-STARTER_FLOW="${REF_DIR}/${SITE_SLUG}.starter-flow.md"
+SITE_PROFILE="${REF_DIR}/${SITE_SLUG}.sitemap.md"
 STARTER_EVAL="${EVAL_DIR}/${SITE_SLUG}.starter.eval.yaml"
 STARTER_PATH="${EVAL_DIR}/${SITE_SLUG}.starter.path.yaml"
 
@@ -42,6 +41,8 @@ if [[ ! -f "${SITE_ENV}" ]]; then
 # Site-specific browser flags for ${CLI_NAME}.
 # Example:
 # CLI_ANYWEB_AGENT_BROWSER_FLAGS='--user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"'
+# Optional: reuse an explicit browser profile directory across sessions.
+# CLI_ANYWEB_SITE_PROFILE_DIR='/path/to/site/.agent-browser-profile'
 EOF
 fi
 
@@ -210,7 +211,15 @@ def _load_site_env():
         if key and key not in os.environ:
             os.environ[key] = value
 
+    _apply_site_profile_dir()
     os.environ.setdefault("CLI_ANYWEB_SITE_ROOT", str(site_root))
+
+
+def _apply_site_profile_dir():
+    profile_dir = (os.environ.get("CLI_ANYWEB_SITE_PROFILE_DIR") or "").strip()
+    if not profile_dir or os.environ.get("AGENT_BROWSER_PROFILE"):
+        return
+    os.environ["AGENT_BROWSER_PROFILE"] = profile_dir
 
 
 def main():
@@ -237,8 +246,7 @@ This package wraps the shared \`cli-anyweb\` runtime with ${SITE_NAME}-specific 
 
 ## Bundled Assets
 
-- \`skills/references/${SITE_SLUG}.site-profile.md\`
-- \`skills/references/${SITE_SLUG}.starter-flow.md\`
+- \`skills/references/${SITE_SLUG}.sitemap.md\`
 - \`skills/evals/${SITE_SLUG}.starter.eval.yaml\`
 - \`skills/evals/${SITE_SLUG}.starter.path.yaml\`
 EOF
@@ -252,8 +260,7 @@ Use this site harness when working on ${SITE_NAME}.
 
 ## Local Assets
 
-- \`skills/references/${SITE_SLUG}.site-profile.md\`
-- \`skills/references/${SITE_SLUG}.starter-flow.md\`
+- \`skills/references/${SITE_SLUG}.sitemap.md\`
 - \`skills/evals/${SITE_SLUG}.starter.eval.yaml\`
 - \`skills/evals/${SITE_SLUG}.starter.path.yaml\`
 
@@ -281,98 +288,42 @@ fi
 
 if [[ ! -f "${SITE_PROFILE}" ]]; then
   cat > "${SITE_PROFILE}" <<EOF
-# ${SITE_NAME} Site Profile
+# ${SITE_NAME} SiteMap
 
-## Site Summary
+## SiteMap
 
-- domain:
-- site type:
-- public or gated:
-- auth requirements:
-
-## Entry Points
-
-- primary entry URL:
-- alternate entry URLs:
-
-## Main Surfaces
-
-- primary navigation:
-- search surface:
-- detail surface:
-- account surface:
-
-## Stable Anchors
-
-- labels:
-- buttons:
-- headings:
-- landmarks:
-
-## Risks
-
-- anti-bot or risk controls:
-- login walls:
-- dynamic content:
-- localization issues:
-
-## Candidate Flows
-
-- starter flow:
-- next likely flow:
-- risky flow to avoid first:
-EOF
-fi
-
-if [[ ! -f "${STARTER_FLOW}" ]]; then
-  cat > "${STARTER_FLOW}" <<EOF
-# ${SITE_NAME} Starter Flow
-
-## Scope
-
-- target site: ${SITE_NAME}
-- target flow:
-- preconditions:
-
-## Stable Anchors
-
-- visible landmarks:
-- reliable labels or headings:
-- persistent buttons or inputs:
-
-## Recommended Path
-
-1. Open:
-2. Snapshot or inspect:
-3. First interaction:
-4. Follow-up interactions:
-5. Verify completion:
-
-## Suggested Harness Commands
-
-\`\`\`bash
-${CLI_NAME} open <url>
-${CLI_NAME} snapshot
-${CLI_NAME} find "<key text>"
+\`\`\`text
+<entry-url>
+\`-- <logged-out surface>
+    |-- <primary navigation>
+    |-- <content area>
+    \`-- <overlay or gate>
 \`\`\`
 
-## Common Failure Modes
+Use this first section to capture the validated site map in markdown / ASCII.
 
-- popup or cookie banner:
-- lazy-loading or delayed widgets:
-- auth redirect:
-- duplicate labels:
+## Logged-Out
 
-## Fallback Strategy
+- validated branches:
+- observed gates:
+- public entry points:
 
-- if primary anchor fails:
-- if the page structure changes:
-- if text search is ambiguous:
+## Logged-In
 
-## Success Criteria
+- validated branches:
+- pending branches:
+- auth-only surfaces:
 
-- page state that proves success:
-- URL, title, or text that proves completion:
+## Main Chains Derived From The SiteMap
+
+- public-first chains:
+- auth-required chains:
+
+## Proposed CLI Surface
+
+- command groups to expose:
+- auth split to preserve:
+- flows still pending validation:
 EOF
 fi
 
@@ -414,6 +365,5 @@ echo "  ${SITE_ROOT}"
 echo "  ${SITE_SETUP}"
 echo "  ${PKG_CLI}"
 echo "  ${SITE_PROFILE}"
-echo "  ${STARTER_FLOW}"
 echo "  ${STARTER_EVAL}"
 echo "  ${STARTER_PATH}"

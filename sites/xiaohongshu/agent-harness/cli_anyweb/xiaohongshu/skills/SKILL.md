@@ -4,11 +4,18 @@ Use this site harness when working on xiaohongshu.
 
 ## Local Assets
 
-- `skills/references/xiaohongshu.site-profile.md`
-- `skills/references/xiaohongshu.entry-risk-gate.md`
-- `skills/references/xiaohongshu.starter-flow.md`
+- `skills/references/xiaohongshu.sitemap.md`
 - `skills/evals/xiaohongshu.starter.eval.yaml`
 - `skills/evals/xiaohongshu.starter.path.yaml`
+
+## Commands
+
+| Command | Description |
+|---|---|
+| `home` | Open `/explore` |
+| `search --query Q [--type all\|video\|notes\|users]` | Search with optional content-type tab |
+| `open-note --url URL \| --note-id ID [--xsec-token T] [--extract]` | Open a note; `--extract` prints JSON |
+| `login` / `publish` / `notifications` / `profile` | Auth-required surfaces |
 
 ## Operating Principle
 

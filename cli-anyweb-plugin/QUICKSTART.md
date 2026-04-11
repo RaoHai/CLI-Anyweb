@@ -65,8 +65,7 @@ sites/xiaohongshu/agent-harness/
       |- skills/
       |  |- SKILL.md
       |  |- references/
-      |  |  |- xiaohongshu.site-profile.md
-      |  |  `- xiaohongshu.starter-flow.md
+      |  |  `- xiaohongshu.sitemap.md
       |  `- evals/
       |     |- xiaohongshu.starter.eval.yaml
       |     `- xiaohongshu.starter.path.yaml
@@ -96,15 +95,26 @@ cli-anyweb-xiaohongshu find "search"
 cli-anyweb-xiaohongshu get url
 ```
 
-## Save The First Real Flow
+## Save The First Site Map And Flow Assets
 
-Once you have one validated starter flow, update:
+Once you have enough validation to define the first real CLI chains, update:
 
 - `sites/<site>/agent-harness/site.env`
-- `sites/<site>/agent-harness/cli_anyweb/<site>/skills/references/<site>.site-profile.md`
-- `sites/<site>/agent-harness/cli_anyweb/<site>/skills/references/<site>.starter-flow.md`
+- `sites/<site>/agent-harness/cli_anyweb/<site>/skills/references/<site>.sitemap.md`
 - `sites/<site>/agent-harness/cli_anyweb/<site>/skills/evals/<site>.starter.eval.yaml`
 - `sites/<site>/agent-harness/cli_anyweb/<site>/skills/evals/<site>.starter.path.yaml`
+
+If the site needs login, add a reusable profile path in `site.env`:
+
+```bash
+CLI_ANYWEB_SITE_PROFILE_DIR="/absolute/path/to/.agent-browser-profile"
+```
+
+If you need a visible browser window to log in, also set:
+
+```bash
+AGENT_BROWSER_HEADED=true
+```
 
 ## Common Workflow
 

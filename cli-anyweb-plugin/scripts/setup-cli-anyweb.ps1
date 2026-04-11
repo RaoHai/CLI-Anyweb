@@ -31,8 +31,7 @@ $pkgReadme = Join-Path $packageDir "README.md"
 $skillMd = Join-Path $packageDir "skills\SKILL.md"
 $testInit = Join-Path $testDir "__init__.py"
 $testMd = Join-Path $testDir "TEST.md"
-$siteProfile = Join-Path $refDir ($siteSlug + ".site-profile.md")
-$starterFlow = Join-Path $refDir ($siteSlug + ".starter-flow.md")
+$siteProfile = Join-Path $refDir ($siteSlug + ".sitemap.md")
 $starterEval = Join-Path $evalDir ($siteSlug + ".starter.eval.yaml")
 $starterPath = Join-Path $evalDir ($siteSlug + ".starter.path.yaml")
 
@@ -51,6 +50,8 @@ $siteEnvContent = @'
 # Site-specific browser flags for __CLI_NAME__.
 # Example:
 # CLI_ANYWEB_AGENT_BROWSER_FLAGS='--user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"'
+# Optional: reuse an explicit browser profile directory across sessions.
+# CLI_ANYWEB_SITE_PROFILE_DIR='C:\path\to\site\.agent-browser-profile'
 '@.Replace("__CLI_NAME__", $cliName)
 
 $siteReadmeContent = @'
@@ -208,7 +209,15 @@ def _load_site_env():
         if key and key not in os.environ:
             os.environ[key] = value
 
+    _apply_site_profile_dir()
     os.environ.setdefault("CLI_ANYWEB_SITE_ROOT", str(site_root))
+
+
+def _apply_site_profile_dir():
+    profile_dir = (os.environ.get("CLI_ANYWEB_SITE_PROFILE_DIR") or "").strip()
+    if not profile_dir or os.environ.get("AGENT_BROWSER_PROFILE"):
+        return
+    os.environ["AGENT_BROWSER_PROFILE"] = profile_dir
 
 
 def main():
@@ -233,8 +242,7 @@ This package wraps the shared `cli-anyweb` runtime with __SITE_NAME__-specific a
 
 ## Bundled Assets
 
-- `skills/references/__SITE_SLUG__.site-profile.md`
-- `skills/references/__SITE_SLUG__.starter-flow.md`
+- `skills/references/__SITE_SLUG__.sitemap.md`
 - `skills/evals/__SITE_SLUG__.starter.eval.yaml`
 - `skills/evals/__SITE_SLUG__.starter.path.yaml`
 '@
@@ -247,8 +255,7 @@ Use this site harness when working on __SITE_NAME__.
 
 ## Local Assets
 
-- `skills/references/__SITE_SLUG__.site-profile.md`
-- `skills/references/__SITE_SLUG__.starter-flow.md`
+- `skills/references/__SITE_SLUG__.sitemap.md`
 - `skills/evals/__SITE_SLUG__.starter.eval.yaml`
 - `skills/evals/__SITE_SLUG__.starter.path.yaml`
 
@@ -271,98 +278,43 @@ $testMdContent = @'
 '@.Replace("__CLI_NAME__", $cliName)
 
 $siteProfileContent = @'
-# __SITE_NAME__ Site Profile
+# __SITE_NAME__ SiteMap
 
-## Site Summary
+## SiteMap
 
-- domain:
-- site type:
-- public or gated:
-- auth requirements:
-
-## Entry Points
-
-- primary entry URL:
-- alternate entry URLs:
-
-## Main Surfaces
-
-- primary navigation:
-- search surface:
-- detail surface:
-- account surface:
-
-## Stable Anchors
-
-- labels:
-- buttons:
-- headings:
-- landmarks:
-
-## Risks
-
-- anti-bot or risk controls:
-- login walls:
-- dynamic content:
-- localization issues:
-
-## Candidate Flows
-
-- starter flow:
-- next likely flow:
-- risky flow to avoid first:
-'@.Replace("__SITE_NAME__", $SiteName)
-
-$starterFlowContent = @'
-# __SITE_NAME__ Starter Flow
-
-## Scope
-
-- target site: __SITE_NAME__
-- target flow:
-- preconditions:
-
-## Stable Anchors
-
-- visible landmarks:
-- reliable labels or headings:
-- persistent buttons or inputs:
-
-## Recommended Path
-
-1. Open:
-2. Snapshot or inspect:
-3. First interaction:
-4. Follow-up interactions:
-5. Verify completion:
-
-## Suggested Harness Commands
-
-```bash
-__CLI_NAME__ open <url>
-__CLI_NAME__ snapshot
-__CLI_NAME__ find "<key text>"
+```text
+<entry-url>
+`-- <logged-out surface>
+    |-- <primary navigation>
+    |-- <content area>
+    `-- <overlay or gate>
 ```
 
-## Common Failure Modes
+Use this first section to capture the validated site map in markdown / ASCII.
 
-- popup or cookie banner:
-- lazy-loading or delayed widgets:
-- auth redirect:
-- duplicate labels:
+## Logged-Out
 
-## Fallback Strategy
+- validated branches:
+- observed gates:
+- public entry points:
 
-- if primary anchor fails:
-- if the page structure changes:
-- if text search is ambiguous:
+## Logged-In
 
-## Success Criteria
+- validated branches:
+- pending branches:
+- auth-only surfaces:
 
-- page state that proves success:
-- URL, title, or text that proves completion:
-'@
-$starterFlowContent = $starterFlowContent.Replace("__SITE_NAME__", $SiteName).Replace("__CLI_NAME__", $cliName)
+## Main Chains Derived From The SiteMap
+
+- public-first chains:
+- auth-required chains:
+
+## Proposed CLI Surface
+
+- command groups to expose:
+- auth split to preserve:
+- flows still pending validation:
+'@.Replace("__SITE_NAME__", $SiteName)
 
 $starterEvalContent = @'
 id: __SITE_SLUG__.starter
@@ -406,7 +358,6 @@ Write-Utf8FileIfMissing -Path $skillMd -Content $skillMdContent
 Write-Utf8FileIfMissing -Path $testInit -Content $testInitContent
 Write-Utf8FileIfMissing -Path $testMd -Content $testMdContent
 Write-Utf8FileIfMissing -Path $siteProfile -Content $siteProfileContent
-Write-Utf8FileIfMissing -Path $starterFlow -Content $starterFlowContent
 Write-Utf8FileIfMissing -Path $starterEval -Content $starterEvalContent
 Write-Utf8FileIfMissing -Path $starterPath -Content $starterPathContent
 
@@ -415,6 +366,5 @@ Write-Output "  $siteRoot"
 Write-Output "  $siteSetup"
 Write-Output "  $pkgCli"
 Write-Output "  $siteProfile"
-Write-Output "  $starterFlow"
 Write-Output "  $starterEval"
 Write-Output "  $starterPath"

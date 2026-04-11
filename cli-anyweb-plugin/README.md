@@ -17,7 +17,7 @@ This plugin structure helps contributors:
 2. identify candidate flows
 3. validate one minimal reusable flow
 4. generate a standalone site harness with its own CLI
-5. save references, path artifacts, and eval cases inside that harness
+5. save one sitemap reference plus path artifacts and eval cases inside that harness
 6. define site-specific setup such as a real UA or custom browser flags
 
 The result is not just one successful browser session.
@@ -56,7 +56,7 @@ At a high level:
 1. scaffold a standalone site harness
 2. inspect the site with the generic `cli-anyweb` runtime
 3. model the site before assuming flows
-4. save the first validated starter flow inside the generated harness
+4. save a lean sitemap split by logged-out and logged-in state
 5. replay and score that flow
 6. expand coverage incrementally
 

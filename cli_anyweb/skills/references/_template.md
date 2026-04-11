@@ -1,53 +1,44 @@
-# <site or flow name>
+# <site> SiteMap
 
-## Scope
+## SiteMap
 
-- target site:
-- target flow:
-- preconditions:
-
-## Stable Anchors
-
-- visible landmarks:
-- reliable labels or headings:
-- persistent buttons/inputs:
-
-## Recommended Path
-
-1. Open:
-2. Snapshot or inspect:
-3. First interaction:
-4. Follow-up interactions:
-5. Verify completion:
-
-## Suggested Harness Commands
-
-```bash
-cli-anyweb open <url>
-cli-anyweb --json ls /
-cli-anyweb --json grep "<key text>"
+```text
+<entry-url>
+`-- <main surface>
+    |-- <primary navigation>
+    |-- <content area>
+    `-- <overlay or gate>
 ```
 
-## Common Failure Modes
+Use this first section to capture the validated site map in markdown / ASCII.
+Prefer real entry URLs, major surfaces, redirects, and overlays over abstract descriptions.
 
-- popups or cookie banners:
-- lazy-loading or delayed widgets:
-- auth redirects:
-- duplicate labels:
+## Logged-Out
 
-## Fallback Strategy
+- validated branches:
+- observed gates:
+- public entry points:
 
-- if primary anchor fails:
-- if the page structure changes:
-- if text search is ambiguous:
+## Logged-In
 
-## Success Criteria
+- validated branches:
+- pending branches:
+- auth-only surfaces:
 
-- what page state proves success:
-- what URL/title/text proves completion:
+## Login State Reuse
 
-## Notes For Future Evals
+- profile directory (absolute path):
+- how it is set (for example, `CLI_ANYWEB_SITE_PROFILE_DIR`):
+- how it is consumed (exported as `AGENT_BROWSER_PROFILE` for agent-browser):
+- headed login tip (set `AGENT_BROWSER_HEADED=true` if the window is hidden):
 
-- fragile steps:
-- metrics worth tracking:
-- candidate alternative paths:
+## Main Chains Derived From The SiteMap
+
+- public-first chains:
+- auth-required chains:
+
+## Proposed CLI Surface
+
+- command groups to expose:
+- auth split to preserve:
+- flows still pending validation:

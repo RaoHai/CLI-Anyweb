@@ -42,6 +42,6 @@ The refinement pass should usually update one or more of:
 
 - `references/<site>/README.md`
 - `references/<site>/site.env`
-- `cli_anyweb/skills/references/<site>.site-profile.md`
+- `cli_anyweb/skills/references/<site>.sitemap.md`
 - `cli_anyweb/skills/references/<site>.*.md`
 - `cli_anyweb/skills/evals/<site>.*.yaml`

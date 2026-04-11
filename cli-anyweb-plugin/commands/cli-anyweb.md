@@ -38,14 +38,13 @@ sites/<site>/agent-harness/
 `- cli_anyweb/
    |- __init__.py
    `- <site>/
-      |- <site>_cli.py
-      |- skills/
-      |  |- references/
-      |  |  |- <site>.site-profile.md
-      |  |  `- <site>.starter-flow.md
-      |  `- evals/
-      |     |- <site>.starter.eval.yaml
-      |     `- <site>.starter.path.yaml
+   |- <site>_cli.py
+   |- skills/
+   |  |- references/
+   |  |  `- <site>.sitemap.md
+   |  `- evals/
+   |     |- <site>.starter.eval.yaml
+   |     `- <site>.starter.path.yaml
       `- tests/
 ```
 
@@ -56,8 +55,8 @@ The intended sequence is:
 1. run `bash scripts/setup-cli-anyweb.sh <site>` or `powershell -ExecutionPolicy Bypass -File .\scripts\setup-cli-anyweb.ps1 <site>`
 2. install the generated harness under `sites/<site>/agent-harness/`
 3. inspect the live site with the standalone CLI plus `open`, `snapshot`, `find`, and `get`
-4. update the site profile with entry points, anchors, and risks
-5. update the starter flow with one validated path
+4. update the sitemap with logged-out and logged-in branches
+5. derive the main chains and proposed CLI surface from that sitemap
 6. update the eval and path artifact to match the validated flow
 
 ## Example

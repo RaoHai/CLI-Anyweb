@@ -88,8 +88,7 @@ Notes:
 Each site integration should aim to produce a small but reusable asset set:
 
 - a site setup entry point
-- a site profile
-- one or more flow references
+- a sitemap reference
 - one or more path artifacts
 - one or more eval cases
 - optional site wrappers for browser flags, auth prerequisites, or launch behavior
@@ -131,9 +130,8 @@ The first task is:
 
 The first successful onboarding should ideally produce:
 
-- a basic site profile
+- a basic sitemap reference
 - several candidate flows
-- one selected starter flow
 - a replayable path artifact
 - an eval case for that flow
 
@@ -255,40 +253,47 @@ export CLI_ANYWEB_AGENT_BROWSER_FLAGS='--user-agent "Mozilla/5.0 (Windows NT 10.
 
 The exact flag support depends on `agent-browser`, but the harness forwards extra browser flags from this environment variable.
 
+### Reusing Login State
+
+If a site requires login, persist a browser profile directory and reuse it across sessions:
+
+- set `CLI_ANYWEB_SITE_PROFILE_DIR` in `site.env`
+- the wrapper will export it as `AGENT_BROWSER_PROFILE`
+- `agent-browser` will reuse the profile automatically
+- use an absolute path so the profile is resolved consistently
+
+This keeps the login state consistent without hardcoding credentials.
+
+### Manual Login Tip
+
+If the browser window is not visible during login, set:
+
+- `AGENT_BROWSER_HEADED=true` in `site.env`
+
+This forces a headed browser so a human can complete the login once, then reuse the profile.
+
 ## Persisted Assets
 
 When an unknown site is first explored successfully, the result should not remain a one-off run.
 It should be persisted as layered assets.
 
-### 1. Site Profile
+### 1. SiteMap Reference
 
-Describes what the site is.
-
-Suggested contents:
-
-- site type
-- entry points
-- main navigation regions
-- common anchor vocabulary
-- auth requirements
-- dynamic behavior
-- obvious risks
-
-### 2. Flow Reference
-
-Describes how one real flow works.
+Describes the reachable information architecture of the site.
 
 Suggested contents:
 
-- flow name
-- entry point
-- preconditions
-- main steps
-- stable anchors
-- success criteria
-- fallback path
+- a markdown or ASCII `SiteMap`
+- a `Logged-Out` branch based on validated observations
+- a `Logged-In` branch, marked as validated or pending validation
+- the major surfaces and gates visible from each auth state
+- the main chains that can be derived from the map
+- the proposed CLI surface that should be built from those chains
 
-### 3. Replayable Path Artifact
+Keep this artifact lean.
+It should help future agents extract the site's main chains, not read a long narrative report.
+
+### 2. Replayable Path Artifact
 
 Describes how the machine should attempt replay.
 
@@ -300,7 +305,7 @@ Suggested contents:
 - success assertions
 - fallback branches
 
-### 4. Eval Case
+### 3. Eval Case
 
 Describes how the saved flow should be checked later.
 
@@ -341,19 +346,19 @@ Keep the plugin-facing command set close to the upstream `cli-anything-plugin` s
 
 ```text
 cli-anyweb-plugin/
-├── .claude-plugin/
-├── commands/
-├── guides/
-├── scripts/
-├── templates/
-├── tests/
-├── HARNESS.md
-├── README.md
-├── QUICKSTART.md
-├── PUBLISHING.md
-├── repl_skin.py
-├── skill_generator.py
-└── verify-plugin.sh
+|-- .claude-plugin/
+|-- commands/
+|-- guides/
+|-- scripts/
+|-- templates/
+|-- tests/
+|-- HARNESS.md
+|-- README.md
+|-- QUICKSTART.md
+|-- PUBLISHING.md
+|-- repl_skin.py
+|-- skill_generator.py
+`-- verify-plugin.sh
 ```
 
 The point of this similarity is practical:

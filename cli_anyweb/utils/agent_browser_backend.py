@@ -12,6 +12,8 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
+import threading
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -19,6 +21,32 @@ from typing import Any
 
 AGENT_BROWSER_CMD = "agent-browser"
 _daemon_enabled = False
+
+_SUBPROCESS_TIMEOUT = 90
+
+
+def _kill_process_tree(pid: int) -> None:
+    """Kill a process and all its descendants, non-blocking (fire-and-forget).
+
+    On Windows, proc.kill() + proc.wait() hangs because npm/.cmd wrappers
+    spawn Node/Chromium child processes that don't die automatically.
+    Using Popen (no wait) for taskkill avoids that secondary hang.
+    """
+    if sys.platform == "win32":
+        subprocess.Popen(
+            ["taskkill", "/F", "/T", "/PID", str(pid)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    else:
+        try:
+            import signal
+            os.killpg(os.getpgid(pid), signal.SIGKILL)
+        except Exception:
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except Exception:
+                pass
 
 
 @dataclass
@@ -38,28 +66,50 @@ def _run_agent_browser(*args: str, expect_json: bool = True) -> dict[str, Any]:
     if expect_json:
         command.append("--json")
     command.extend(args)
+
     try:
-        result = subprocess.run(
+        proc = subprocess.Popen(
             command,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
             encoding="utf-8",
             errors="replace",
-            timeout=30,
         )
     except FileNotFoundError as exc:
         raise RuntimeError(
             "agent-browser not found. Install it with `npm install -g agent-browser` "
             "and run `agent-browser install` once."
         ) from exc
-    except subprocess.TimeoutExpired as exc:
-        raise RuntimeError(f"agent-browser command timed out: {' '.join(command)}") from exc
 
-    stdout = (result.stdout or "").strip()
-    stderr = (result.stderr or "").strip()
+    # Use a daemon thread + Event for timeout so that Event.wait() reliably
+    # returns on Windows (unlike proc.communicate(timeout=N) whose cleanup
+    # path calls proc.wait() which hangs when child processes inherit pipes).
+    _result: list[tuple[str, str]] = []
+    _done = threading.Event()
 
-    if result.returncode != 0:
-        message = stderr or stdout or f"agent-browser exited with code {result.returncode}"
+    def _reader() -> None:
+        try:
+            out, err = proc.communicate()
+            _result.append((out or "", err or ""))
+        except Exception:
+            _result.append(("", ""))
+        finally:
+            _done.set()
+
+    t = threading.Thread(target=_reader, daemon=True)
+    t.start()
+
+    if not _done.wait(timeout=_SUBPROCESS_TIMEOUT):
+        _kill_process_tree(proc.pid)
+        raise RuntimeError(f"agent-browser command timed out: {' '.join(command)}")
+
+    stdout_raw, stderr_raw = _result[0] if _result else ("", "")
+    stdout = stdout_raw.strip()
+    stderr = stderr_raw.strip()
+
+    if proc.returncode != 0:
+        message = stderr or stdout or f"agent-browser exited with code {proc.returncode}"
         raise RuntimeError(message)
 
     if not expect_json:
@@ -319,6 +369,11 @@ def get_value(field: str, use_daemon: bool = False) -> dict[str, Any]:
     normalized = field.strip().lower()
     if normalized == "url":
         return {"field": "url", "value": _get_current_url()}
+    if normalized == "html":
+        payload = _run_agent_browser("get", "html", "html")
+        data = _extract_data(payload)
+        html = data.get("html") or data.get("text") or data.get("value") or data.get("raw")
+        return {"field": "html", "value": html or ""}
     raise ValueError(f"Unsupported field: {field}")
 
 
@@ -330,6 +385,16 @@ def find(pattern: str, use_daemon: bool = False) -> dict[str, Any]:
         "matches": matches,
         "count": len(matches),
     }
+
+
+def eval_js(script: str, use_daemon: bool = False) -> dict[str, Any]:
+    payload = _run_agent_browser("eval", script, expect_json=False)
+    return {"output": payload.get("output", "")}
+
+
+def wait_ms(ms: int, use_daemon: bool = False) -> dict[str, Any]:
+    payload = _run_agent_browser("wait", str(ms), expect_json=False)
+    return {"output": payload.get("output", "")}
 
 
 def click(path: str, use_daemon: bool = False) -> dict[str, Any]:
