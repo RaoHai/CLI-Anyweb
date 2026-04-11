@@ -36,11 +36,11 @@ references/<site>/
 ├── README.md
 └── site.env
 
-agent_harness/skills/references/
+cli_anyweb/skills/references/
 ├── <site>.site-profile.md
 └── <site>.starter-flow.md
 
-agent_harness/skills/evals/
+cli_anyweb/skills/evals/
 ├── <site>.starter.eval.yaml
 └── <site>.starter.path.yaml
 ```

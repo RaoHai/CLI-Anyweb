@@ -10,8 +10,8 @@ fi
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SITE_DIR="${ROOT_DIR}/references/${SITE_NAME}"
-REF_DIR="${ROOT_DIR}/agent_harness/skills/references"
-EVAL_DIR="${ROOT_DIR}/agent_harness/skills/evals"
+REF_DIR="${ROOT_DIR}/cli_anyweb/skills/references"
+EVAL_DIR="${ROOT_DIR}/cli_anyweb/skills/evals"
 
 mkdir -p "${SITE_DIR}" "${REF_DIR}" "${EVAL_DIR}"
 

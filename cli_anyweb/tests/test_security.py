@@ -9,7 +9,7 @@ import os
 
 import pytest
 
-from agent_harness.utils import security
+from cli_anyweb.utils import security
 
 
 def _reload_security_module():
@@ -20,7 +20,7 @@ def _reload_security_module():
 # Reload once at import to ensure clean state
 _reload_security_module()
 
-from agent_harness.utils.security import (
+from cli_anyweb.utils.security import (
     get_allowed_schemes,
     get_blocked_schemes,
     is_private_network_blocked,

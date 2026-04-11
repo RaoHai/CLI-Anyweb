@@ -84,13 +84,13 @@ Preferred environment variables:
 ## Tests
 
 ```bash
-pytest agent_harness/tests/test_core.py -v
-pytest agent_harness/tests/test_security.py -v
+pytest cli_anyweb/tests/test_core.py -v
+pytest cli_anyweb/tests/test_security.py -v
 ```
 
 Real browser E2E tests require `agent-browser` plus Chrome:
 
 ```bash
 $env:AGENT_BROWSER_E2E = "1"
-pytest agent_harness/tests/test_full_e2e.py -v
+pytest cli_anyweb/tests/test_full_e2e.py -v
 ```

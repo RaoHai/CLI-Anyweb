@@ -4,7 +4,7 @@ Make any website more agent-usable through a structured CLI.
 
 `cli-anyweb` is a browser harness and plugin-oriented workflow for turning ordinary websites into reusable, agent-native command surfaces on top of Vercel Labs `agent-browser`.
 
-English | [????](./README.zh-cn.md)
+English | [ZH-CN README](./README.zh-cn.md)
 
 One command line: turn web software built for humans into reusable tools for agents through browser control, site references, replayable paths, and evaluation.
 
@@ -24,7 +24,6 @@ One command line: turn web software built for humans into reusable tools for age
 - [Repository Layout](#repository-layout)
 - [Roadmap](#roadmap)
 - [cli-anyweb-plugin/HARNESS.md](./cli-anyweb-plugin/HARNESS.md)
-- [runtime/README.md](./runtime/README.md)
 - [ROADMAP.md](./ROADMAP.md)
 - [cli-anyweb-plugin](./cli-anyweb-plugin)
 
@@ -140,14 +139,12 @@ The CLI uses a flat command surface such as `open`, `snapshot`, `ls`, `click`, a
 ## Repository Layout
 
 - [setup.py](./setup.py)
-- [runtime/README.md](./runtime/README.md)
-- [agent_harness/README.md](./agent_harness/README.md)
-- [agent_harness/skills/SKILL.md](./agent_harness/skills/SKILL.md)
-- [agent_harness/skills/references](./agent_harness/skills/references)
-- [agent_harness/skills/evals](./agent_harness/skills/evals)
-- [agent_harness/tests/TEST.md](./agent_harness/tests/TEST.md)
+- [cli_anyweb/README.md](./cli_anyweb/README.md)
+- [cli_anyweb/skills/SKILL.md](./cli_anyweb/skills/SKILL.md)
+- [cli_anyweb/skills/references](./cli_anyweb/skills/references)
+- [cli_anyweb/skills/evals](./cli_anyweb/skills/evals)
+- [cli_anyweb/tests/TEST.md](./cli_anyweb/tests/TEST.md)
 - [cli-anyweb-plugin](./cli-anyweb-plugin)
-- [runtime](./runtime)
 - [references](./references)
 - [cli-anyweb-plugin/HARNESS.md](./cli-anyweb-plugin/HARNESS.md)
 
@@ -166,8 +163,7 @@ For the fuller execution plan, see [ROADMAP.md](./ROADMAP.md).
 - Preferred package name: `cli-anyweb`
 - Preferred CLI command: `cli-anyweb`
 - Preferred extra browser flag env var: `CLI_ANYWEB_AGENT_BROWSER_FLAGS`
-- Repository-level execution layer: `runtime/`
-- Current internal Python package path: `agent_harness`
+- Current internal Python package path: `cli_anyweb`
 
 ## Why This Repo Exists
 

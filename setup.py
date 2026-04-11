@@ -4,7 +4,7 @@ from pathlib import Path
 from setuptools import find_packages, setup
 
 ROOT = Path(__file__).parent
-README = ROOT / "agent_harness/README.md"
+README = ROOT / "cli_anyweb/README.md"
 
 
 def read_readme():
@@ -27,7 +27,7 @@ setup(
         "Issues": "https://github.com/HKUDS/CLI-Anything/issues",
     },
     license="MIT",
-    packages=find_packages(include=["agent_harness*"]),
+    packages=find_packages(include=["cli_anyweb*"]),
     python_requires=">=3.10",
     install_requires=[
         "click>=8.1,<9.0",
@@ -43,11 +43,11 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "cli-anyweb=agent_harness.gui_agent_harness_cli:main",
+            "cli-anyweb=cli_anyweb.cli_anyweb_cli:main",
         ],
     },
     package_data={
-        "agent_harness": [
+        "cli_anyweb": [
             "skills/*.md",
             "skills/references/*.md",
             "skills/references/*/*.md",

@@ -34,10 +34,10 @@ from typing import Optional
 
 import click
 
-from agent_harness.core import fs as fs_mod
-from agent_harness.core import page as page_mod
-from agent_harness.core.session import Session
-from agent_harness.utils import agent_browser_backend as backend
+from cli_anyweb.core import fs as fs_mod
+from cli_anyweb.core import page as page_mod
+from cli_anyweb.core.session import Session
+from cli_anyweb.utils import agent_browser_backend as backend
 
 _session: Optional[Session] = None
 _json_output = False
@@ -376,7 +376,7 @@ def daemon_stop_command():
 @handle_error
 def repl():
     """Start interactive REPL session."""
-    from agent_harness.utils.repl_skin import ReplSkin
+    from cli_anyweb.utils.repl_skin import ReplSkin
 
     global _repl_mode
     _repl_mode = True

@@ -10,10 +10,10 @@ Handles navigation and page operations:
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from agent_harness.core.session import Session
+    from cli_anyweb.core.session import Session
 
-from agent_harness.utils import agent_browser_backend as backend
-from agent_harness.utils.security import validate_url
+from cli_anyweb.utils import agent_browser_backend as backend
+from cli_anyweb.utils.security import validate_url
 
 
 def open_page(session: "Session", url: str) -> dict:

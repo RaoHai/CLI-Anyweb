@@ -17,7 +17,7 @@ Its role is not only to expose browser control, but to give agents a structured 
 
 ```text
 CLI Commands
-  -> agent_harness/gui_agent_harness_cli.py
+  -> cli_anyweb/cli_anyweb_cli.py
   -> core/page.py, core/fs.py, core/session.py
   -> utils/agent_browser_backend.py
   -> subprocess calls to `agent-browser --json ...`

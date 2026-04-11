@@ -47,9 +47,9 @@ This project is meant to:
 
 ## Reference System
 
-- Reference index: [references/README.md](Y:\CLI-Anything\CLI-anyweb\agent_harness\skills\references\README.md)
-- Site template: [references/_template.md](Y:\CLI-Anything\CLI-anyweb\agent_harness\skills\references\_template.md)
-- Example site reference: [references/example.com.md](Y:\CLI-Anything\CLI-anyweb\agent_harness\skills\references\example.com.md)
+- Reference index: [references/README.md](Y:\CLI-Anything\CLI-anyweb\cli_anyweb\skills\references\README.md)
+- Site template: [references/_template.md](Y:\CLI-Anything\CLI-anyweb\cli_anyweb\skills\references\_template.md)
+- Example site reference: [references/example.com.md](Y:\CLI-Anything\CLI-anyweb\cli_anyweb\skills\references\example.com.md)
 
 Each site reference should capture:
 
@@ -61,8 +61,8 @@ Each site reference should capture:
 
 ## Path Discovery And Evals
 
-- Discovery workflow: [evals/AUTOPATH.md](Y:\CLI-Anything\CLI-anyweb\agent_harness\skills\evals\AUTOPATH.md)
-- Eval workflow: [evals/EVALS.md](Y:\CLI-Anything\CLI-anyweb\agent_harness\skills\evals\EVALS.md)
+- Discovery workflow: [evals/AUTOPATH.md](Y:\CLI-Anything\CLI-anyweb\cli_anyweb\skills\evals\AUTOPATH.md)
+- Eval workflow: [evals/EVALS.md](Y:\CLI-Anything\CLI-anyweb\cli_anyweb\skills\evals\EVALS.md)
 
 The intended loop is:
 

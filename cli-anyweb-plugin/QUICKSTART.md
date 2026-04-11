@@ -44,8 +44,8 @@ This creates the baseline structure for a new site integration.
 **Output roots:**
 
 - `references/xiaohongshu/`
-- `agent_harness/skills/references/`
-- `agent_harness/skills/evals/`
+- `cli_anyweb/skills/references/`
+- `cli_anyweb/skills/evals/`
 
 ## What The Setup Script Creates
 
@@ -56,11 +56,11 @@ references/xiaohongshu/
 ├── README.md
 └── site.env
 
-agent_harness/skills/references/
+cli_anyweb/skills/references/
 ├── xiaohongshu.site-profile.md
 └── xiaohongshu.starter-flow.md
 
-agent_harness/skills/evals/
+cli_anyweb/skills/evals/
 ├── xiaohongshu.starter.eval.yaml
 └── xiaohongshu.starter.path.yaml
 ```
@@ -87,10 +87,10 @@ cli-anyweb get url
 
 Once you have one validated starter flow, update:
 
-- `agent_harness/skills/references/<site>.site-profile.md`
-- `agent_harness/skills/references/<site>.starter-flow.md`
-- `agent_harness/skills/evals/<site>.starter.eval.yaml`
-- `agent_harness/skills/evals/<site>.starter.path.yaml`
+- `cli_anyweb/skills/references/<site>.site-profile.md`
+- `cli_anyweb/skills/references/<site>.starter-flow.md`
+- `cli_anyweb/skills/evals/<site>.starter.eval.yaml`
+- `cli_anyweb/skills/evals/<site>.starter.path.yaml`
 
 ## Test And Validate
 
@@ -111,6 +111,6 @@ cli-anyweb snapshot
 ## Next Steps
 
 1. read [HARNESS.md](./HARNESS.md)
-2. inspect an existing site asset under `agent_harness/skills/references/`
+2. inspect an existing site asset under `cli_anyweb/skills/references/`
 3. add a real starter flow
 4. replay and refine it

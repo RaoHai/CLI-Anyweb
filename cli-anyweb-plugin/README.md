@@ -59,8 +59,7 @@ At a high level:
 
 ## Relationship To The Repository
 
-- runtime overview: [../runtime/README.md](../runtime/README.md)
-- runtime package: [../agent_harness/README.md](../agent_harness/README.md)
+- runtime package: [../cli_anyweb/README.md](../cli_anyweb/README.md)
 - plugin SOP: [./HARNESS.md](./HARNESS.md)
 - repo overview: [../README.md](../README.md)
 

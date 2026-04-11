@@ -1,17 +1,17 @@
-"""E2E tests for cli-anything-anyweb 鈥?Requires Chrome + DOMShell extension.
+"""E2E tests for cli-anyweb.
 
-These tests interact with real Chrome and DOMShell. Skip if DOMShell is not available.
+These tests interact with a real browser via agent-browser.
 
 Usage:
-    python -m pytest cli_anything/browser/tests/test_full_e2e.py -v
+    python -m pytest cli_anyweb/tests/test_full_e2e.py -v
 """
 
 import os
 import pytest
 from click.testing import CliRunner
 
-from agent_harness.utils.agent_browser_backend import is_available
-from agent_harness.gui_agent_harness_cli import cli
+from cli_anyweb.utils.agent_browser_backend import is_available
+from cli_anyweb.cli_anyweb_cli import cli
 
 # Control whether to run browser E2E tests via an environment variable.
 # This avoids invoking the external CLI during test collection

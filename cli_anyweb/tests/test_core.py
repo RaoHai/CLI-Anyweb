@@ -9,9 +9,9 @@ Usage:
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from agent_harness.core.session import Session
-from agent_harness.core import page, fs
-from agent_harness.utils import agent_browser_backend as backend
+from cli_anyweb.core.session import Session
+from cli_anyweb.core import page, fs
+from cli_anyweb.utils import agent_browser_backend as backend
 
 
 # Session Tests
@@ -131,7 +131,7 @@ class TestPageModule:
         """Opening a page updates session state."""
         sess = Session()
 
-        with patch("agent_harness.core.page.backend.open_url") as mock_open:
+        with patch("cli_anyweb.core.page.backend.open_url") as mock_open:
             mock_open.return_value = {"url": "https://example.com", "status": "loaded"}
 
             result = page.open_page(sess, "https://example.com")
@@ -144,7 +144,7 @@ class TestPageModule:
         sess = Session()
         sess.set_url("https://example.com")
 
-        with patch("agent_harness.core.page.backend.reload") as mock_reload:
+        with patch("cli_anyweb.core.page.backend.reload") as mock_reload:
             mock_reload.return_value = {"status": "reloaded"}
 
             result = page.reload_page(sess)
@@ -156,7 +156,7 @@ class TestPageModule:
         sess.set_url("https://first.com")
         sess.set_url("https://second.com")
 
-        with patch("agent_harness.core.page.backend.back") as mock_back:
+        with patch("cli_anyweb.core.page.backend.back") as mock_back:
             mock_back.return_value = {"url": "https://first.com", "status": "navigated"}
 
             result = page.go_back(sess)
@@ -168,7 +168,7 @@ class TestPageModule:
         """Going back with empty history returns error."""
         sess = Session()
 
-        with patch("agent_harness.core.page.backend.back") as mock_back:
+        with patch("cli_anyweb.core.page.backend.back") as mock_back:
             mock_back.return_value = {"error": "No history"}
 
             result = page.go_back(sess)
@@ -181,7 +181,7 @@ class TestPageModule:
         sess.set_url("https://second.com")
         sess.go_back()  # Now at first.com
 
-        with patch("agent_harness.core.page.backend.forward") as mock_forward:
+        with patch("cli_anyweb.core.page.backend.forward") as mock_forward:
             mock_forward.return_value = {"url": "https://second.com", "status": "navigated"}
 
             result = page.go_forward(sess)
@@ -209,7 +209,7 @@ class TestFsModule:
         sess = Session()
         sess.set_working_dir("/main")
 
-        with patch("agent_harness.core.fs.backend.ls") as mock_ls:
+        with patch("cli_anyweb.core.fs.backend.ls") as mock_ls:
             mock_ls.return_value = {
                 "path": "/main",
                 "entries": [{"name": "button", "role": "button", "path": "/main/button[0]"}]
@@ -224,7 +224,7 @@ class TestFsModule:
         sess = Session()
         sess.set_working_dir("/main")
 
-        with patch("agent_harness.core.fs.backend.ls") as mock_ls:
+        with patch("cli_anyweb.core.fs.backend.ls") as mock_ls:
             mock_ls.return_value = {"path": "/div", "entries": []}
 
             result = fs.list_elements(sess, "/div")
@@ -236,7 +236,7 @@ class TestFsModule:
         sess = Session()
         sess.set_working_dir("/main")
 
-        with patch("agent_harness.core.fs.backend.ls") as mock_ls:
+        with patch("cli_anyweb.core.fs.backend.ls") as mock_ls:
             mock_ls.return_value = {"path": "/main", "entries": []}
 
             result = fs.list_elements(sess, "")
@@ -247,7 +247,7 @@ class TestFsModule:
         """Changing to absolute path updates working_dir."""
         sess = Session()
 
-        with patch("agent_harness.core.fs.backend.cd") as mock_cd:
+        with patch("cli_anyweb.core.fs.backend.cd") as mock_cd:
             mock_cd.return_value = {"path": "/main", "status": "changed"}
 
             result = fs.change_directory(sess, "/main")
@@ -260,7 +260,7 @@ class TestFsModule:
         sess = Session()
         sess.set_working_dir("/main/div[0]")
 
-        with patch("agent_harness.core.fs.backend.cd") as mock_cd:
+        with patch("cli_anyweb.core.fs.backend.cd") as mock_cd:
             mock_cd.return_value = {"path": "/main", "status": "changed"}
 
             result = fs.change_directory(sess, "..")
@@ -273,7 +273,7 @@ class TestFsModule:
         sess = Session()
         sess.set_working_dir("/")
 
-        with patch("agent_harness.core.fs.backend.cd") as mock_cd:
+        with patch("cli_anyweb.core.fs.backend.cd") as mock_cd:
             result = fs.change_directory(sess, "..")
 
             assert result["error"] == "Already at root"
@@ -283,7 +283,7 @@ class TestFsModule:
         sess = Session()
         sess.set_working_dir("/main")
 
-        with patch("agent_harness.core.fs.backend.cd") as mock_cd:
+        with patch("cli_anyweb.core.fs.backend.cd") as mock_cd:
             mock_cd.return_value = {"path": "/main", "status": "changed"}
 
             result = fs.change_directory(sess, ".")
@@ -295,7 +295,7 @@ class TestFsModule:
         sess = Session()
         sess.set_working_dir("/main")
 
-        with patch("agent_harness.core.fs.backend.cd") as mock_cd:
+        with patch("cli_anyweb.core.fs.backend.cd") as mock_cd:
             mock_cd.return_value = {"path": "/main/div[0]", "status": "changed"}
 
             result = fs.change_directory(sess, "div[0]")
@@ -307,7 +307,7 @@ class TestFsModule:
         """Reading element calls backend."""
         sess = Session()
 
-        with patch("agent_harness.core.fs.backend.cat") as mock_cat:
+        with patch("cli_anyweb.core.fs.backend.cat") as mock_cat:
             mock_cat.return_value = {
                 "name": "button",
                 "role": "button",
@@ -323,7 +323,7 @@ class TestFsModule:
         sess = Session()
         sess.set_working_dir("/main")
 
-        with patch("agent_harness.core.fs.backend.cat") as mock_cat:
+        with patch("cli_anyweb.core.fs.backend.cat") as mock_cat:
             mock_cat.return_value = {"name": "main", "role": "landmark"}
 
             result = fs.read_element(sess, "")
@@ -334,7 +334,7 @@ class TestFsModule:
         """Grepping calls backend with pattern."""
         sess = Session()
 
-        with patch("agent_harness.core.fs.backend.grep") as mock_grep:
+        with patch("cli_anyweb.core.fs.backend.grep") as mock_grep:
             mock_grep.return_value = {
                 "matches": ["/main/button[0]", "/main/link[1]"]
             }
@@ -347,8 +347,8 @@ class TestFsModule:
         """Grepping with path cds to that path first, then restores."""
         sess = Session()
 
-        with patch("agent_harness.core.fs.backend.grep") as mock_grep, \
-             patch("agent_harness.core.fs.backend.cd") as mock_cd:
+        with patch("cli_anyweb.core.fs.backend.grep") as mock_grep, \
+             patch("cli_anyweb.core.fs.backend.cd") as mock_cd:
             mock_grep.return_value = {"matches": ["/main/button[0]"]}
             mock_cd.return_value = {"path": "/main"}
 
@@ -370,7 +370,7 @@ class TestDaemonMode:
         sess = Session()
         sess.enable_daemon()
 
-        with patch("agent_harness.core.fs.backend.ls") as mock_ls:
+        with patch("cli_anyweb.core.fs.backend.ls") as mock_ls:
             mock_ls.return_value = {"path": "/", "entries": []}
 
             result = fs.list_elements(sess)
@@ -382,7 +382,7 @@ class TestDaemonMode:
         sess = Session()
         # daemon_mode defaults to False
 
-        with patch("agent_harness.core.fs.backend.ls") as mock_ls:
+        with patch("cli_anyweb.core.fs.backend.ls") as mock_ls:
             mock_ls.return_value = {"path": "/", "entries": []}
 
             result = fs.list_elements(sess)
@@ -395,7 +395,7 @@ class TestAgentBrowserBackend:
 
     def test_get_value_url(self):
         """Getting the current URL returns a normalized field payload."""
-        with patch("agent_harness.utils.agent_browser_backend._get_current_url") as mock_get_url:
+        with patch("cli_anyweb.utils.agent_browser_backend._get_current_url") as mock_get_url:
             mock_get_url.return_value = "https://example.com"
 
             result = backend.get_value("url")
@@ -409,7 +409,7 @@ class TestAgentBrowserBackend:
 
     def test_find_wraps_grep_matches_with_count(self):
         """Find exposes grep results in a direct-command friendly shape."""
-        with patch("agent_harness.utils.agent_browser_backend.grep") as mock_grep:
+        with patch("cli_anyweb.utils.agent_browser_backend.grep") as mock_grep:
             mock_grep.return_value = {"matches": ["/main/button[0]", "/main/link[0]"]}
 
             result = backend.find("login")

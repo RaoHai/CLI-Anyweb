@@ -11,9 +11,9 @@ These commands provide filesystem-like navigation:
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from agent_harness.core.session import Session
+    from cli_anyweb.core.session import Session
 
-from agent_harness.utils import agent_browser_backend as backend
+from cli_anyweb.utils import agent_browser_backend as backend
 
 
 def list_elements(session: "Session", path: str = "") -> dict:
