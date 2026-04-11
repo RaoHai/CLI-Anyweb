@@ -1,0 +1,10 @@
+site: xiaohongshu
+flow: home_entry_with_real_ua
+entry_url: https://www.xiaohongshu.com
+steps:
+  - action: open
+    target: https://www.xiaohongshu.com
+  - action: snapshot
+success:
+  page_type: public_home_or_feed
+fallbacks: []

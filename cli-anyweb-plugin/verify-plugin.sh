@@ -28,6 +28,7 @@ check_file "commands/refine.md"
 check_file "commands/test.md"
 check_file "commands/validate.md"
 check_file "scripts/setup-cli-anyweb.sh"
+check_file "scripts/setup-cli-anyweb.ps1"
 
 echo ""
 echo "Checking plugin.json validity..."

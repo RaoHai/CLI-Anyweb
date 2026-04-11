@@ -15,7 +15,7 @@ cp -r /path/to/cli-anyweb-plugin ~/.claude/plugins/cli-anyweb
 /help cli-anyweb
 ```
 
-## Your First Site Integration
+## Your First Site Harness
 
 Start with a real website:
 
@@ -25,92 +25,100 @@ Start with a real website:
 
 The intended workflow is:
 
-1. inspect the site with the generic browser runtime
-2. identify candidate flows
-3. scaffold starter assets
+1. scaffold a standalone site harness
+2. inspect the site with the generic browser runtime
+3. identify candidate flows
 4. validate one minimal reusable flow
-5. save references, path artifacts, and eval cases
+5. save references, path artifacts, and eval cases inside that site harness
 
-## Initialize The Starter Structure
+## Initialize The Site Harness
 
-You can also initialize the starter scaffold directly:
+You can also initialize the standalone scaffold directly:
 
 ```bash
 bash scripts/setup-cli-anyweb.sh xiaohongshu
 ```
 
-This creates the baseline structure for a new site integration.
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\setup-cli-anyweb.ps1 xiaohongshu
+```
 
-**Output roots:**
-
-- `references/xiaohongshu/`
-- `cli_anyweb/skills/references/`
-- `cli_anyweb/skills/evals/`
+This creates a standalone harness project under `sites/xiaohongshu/agent-harness/`.
 
 ## What The Setup Script Creates
 
 For a site like `xiaohongshu`, the setup script creates:
 
 ```text
-references/xiaohongshu/
-├── README.md
-└── site.env
-
-cli_anyweb/skills/references/
-├── xiaohongshu.site-profile.md
-└── xiaohongshu.starter-flow.md
-
-cli_anyweb/skills/evals/
-├── xiaohongshu.starter.eval.yaml
-└── xiaohongshu.starter.path.yaml
+sites/xiaohongshu/agent-harness/
+|- HARNESS.md
+|- README.md
+|- setup.py
+|- site.env
+`- cli_anyweb/
+   |- __init__.py
+   `- xiaohongshu/
+      |- __init__.py
+      |- __main__.py
+      |- xiaohongshu_cli.py
+      |- README.md
+      |- skills/
+      |  |- SKILL.md
+      |  |- references/
+      |  |  |- xiaohongshu.site-profile.md
+      |  |  `- xiaohongshu.starter-flow.md
+      |  `- evals/
+      |     |- xiaohongshu.starter.eval.yaml
+      |     `- xiaohongshu.starter.path.yaml
+      `- tests/
+         |- __init__.py
+         `- TEST.md
 ```
 
-This is the closest equivalent to the initialized project structure that `cli-anything` produces for a GUI-app harness.
+This is the closest equivalent to the initialized project structure that `cli-anything` produces for a software-specific harness.
 
-The important difference is:
+## Install And Run The Generated CLI
 
-- in `cli-anything`, the generated structure comes from the `/cli-anything <software>` build workflow
-- in `cli-anyweb`, the site scaffold currently comes from `setup-cli-anyweb.sh` plus the subsequent site-onboarding workflow
+```bash
+cd sites/xiaohongshu/agent-harness
+pip install -e .
+cli-anyweb-xiaohongshu --help
+```
 
 ## Probe The Site
 
-After setup, use the runtime directly:
+After setup, use the site-specific CLI directly:
 
 ```bash
-cli-anyweb open https://www.xiaohongshu.com
-cli-anyweb snapshot
-cli-anyweb find 搜索
-cli-anyweb get url
+cli-anyweb-xiaohongshu open https://www.xiaohongshu.com
+cli-anyweb-xiaohongshu snapshot
+cli-anyweb-xiaohongshu find "search"
+cli-anyweb-xiaohongshu get url
 ```
 
 ## Save The First Real Flow
 
 Once you have one validated starter flow, update:
 
-- `cli_anyweb/skills/references/<site>.site-profile.md`
-- `cli_anyweb/skills/references/<site>.starter-flow.md`
-- `cli_anyweb/skills/evals/<site>.starter.eval.yaml`
-- `cli_anyweb/skills/evals/<site>.starter.path.yaml`
-
-## Test And Validate
-
-```bash
-/cli-anyweb:test xiaohongshu
-/cli-anyweb:validate xiaohongshu
-```
+- `sites/<site>/agent-harness/site.env`
+- `sites/<site>/agent-harness/cli_anyweb/<site>/skills/references/<site>.site-profile.md`
+- `sites/<site>/agent-harness/cli_anyweb/<site>/skills/references/<site>.starter-flow.md`
+- `sites/<site>/agent-harness/cli_anyweb/<site>/skills/evals/<site>.starter.eval.yaml`
+- `sites/<site>/agent-harness/cli_anyweb/<site>/skills/evals/<site>.starter.path.yaml`
 
 ## Common Workflow
 
-```bash
-bash scripts/setup-cli-anyweb.sh xiaohongshu
-cli-anyweb open https://www.xiaohongshu.com
-cli-anyweb snapshot
-/cli-anyweb:validate xiaohongshu
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\setup-cli-anyweb.ps1 xiaohongshu
+cd .\sites\xiaohongshu\agent-harness
+pip install -e .
+cli-anyweb-xiaohongshu open https://www.xiaohongshu.com
+cli-anyweb-xiaohongshu snapshot
 ```
 
 ## Next Steps
 
 1. read [HARNESS.md](./HARNESS.md)
-2. inspect an existing site asset under `cli_anyweb/skills/references/`
+2. inspect the generated harness under `sites/<site>/agent-harness/`
 3. add a real starter flow
 4. replay and refine it

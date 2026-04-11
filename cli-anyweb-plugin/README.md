@@ -16,11 +16,12 @@ This plugin structure helps contributors:
 1. analyze an unknown website
 2. identify candidate flows
 3. validate one minimal reusable flow
-4. save references, path artifacts, and eval cases
-5. define site-specific setup such as a real UA or custom browser flags
+4. generate a standalone site harness with its own CLI
+5. save references, path artifacts, and eval cases inside that harness
+6. define site-specific setup such as a real UA or custom browser flags
 
 The result is not just one successful browser session.
-The result is a replayable site integration.
+The result is a replayable site integration with its own runnable CLI.
 
 ## Included Structure
 
@@ -30,7 +31,8 @@ The result is a replayable site integration.
 - `PUBLISHING.md`: packaging and distribution notes
 - `commands/`: plugin command definitions
 - `guides/`: deeper implementation notes inherited from the upstream plugin shape
-- `scripts/setup-cli-anyweb.sh`: site setup helper
+- `scripts/setup-cli-anyweb.sh`: bash site setup helper
+- `scripts/setup-cli-anyweb.ps1`: PowerShell site setup helper
 - `templates/`: reusable generation templates
 - `tests/`: plugin-level tests
 - `repl_skin.py`: shared REPL skin helper
@@ -51,11 +53,12 @@ The canonical SOP lives in [HARNESS.md](./HARNESS.md).
 
 At a high level:
 
-1. inspect the site with the generic `cli-anyweb` runtime
-2. model the site before assuming flows
-3. save the first validated starter flow
-4. replay and score that flow
-5. expand coverage incrementally
+1. scaffold a standalone site harness
+2. inspect the site with the generic `cli-anyweb` runtime
+3. model the site before assuming flows
+4. save the first validated starter flow inside the generated harness
+5. replay and score that flow
+6. expand coverage incrementally
 
 ## Relationship To The Repository
 

@@ -1,4 +1,4 @@
-# xiaohongshu.com entry risk gate
+# xiaohongshu Entry Risk Gate
 
 ## Scope
 
@@ -24,10 +24,10 @@
 ## Suggested Harness Commands
 
 ```bash
-cli-anyweb open https://www.xiaohongshu.com
-cli-anyweb --json snapshot
-cli-anyweb find 300012
-cli-anyweb get url
+cli-anyweb-xiaohongshu open https://www.xiaohongshu.com
+cli-anyweb-xiaohongshu snapshot
+cli-anyweb-xiaohongshu find 300012
+cli-anyweb-xiaohongshu get url
 ```
 
 ## Common Failure Modes
@@ -47,9 +47,3 @@ cli-anyweb get url
 - the page clearly indicates entry is blocked by a site-side restriction
 - the flow exits without pretending that normal homepage exploration succeeded
 - the agent records that a reliable network is required before deeper public-flow references are validated
-
-## Notes For Future Evals
-
-- fragile steps: text wording and error codes may change
-- metrics worth tracking: whether the risk gate still appears, whether the error code changes, whether normal entry becomes available
-- candidate alternative paths: retry from a reliable network, then validate `search_and_open_note`

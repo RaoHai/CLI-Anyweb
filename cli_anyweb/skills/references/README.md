@@ -1,10 +1,10 @@
 # References
 
-This directory stores per-site best practices for the GUI harness.
+This directory stores shared reference examples for the generic cli-anyweb runtime.
 
 ## Purpose
 
-Each reference should explain how to interact with a specific website or product surface in a way that is:
+Each reference should explain how to interact with a website or product surface in a way that is:
 
 - robust across small UI changes
 - easy for a model to replay
@@ -13,8 +13,6 @@ Each reference should explain how to interact with a specific website or product
 ## Suggested Naming
 
 - `example.com.md`
-- `xiaohongshu.com-site-profile.md`
-- `xiaohongshu.com-entry-risk-gate.md`
 - `github.com-login.md`
 - `notion.so-editor.md`
 - `aws-console-s3.md`
@@ -33,5 +31,5 @@ Each reference should explain how to interact with a specific website or product
 
 1. Explore the site with `cli-anyweb`
 2. Identify the shortest reliable path
-3. Write a reference using [_template.md](./_template.md)
-4. Add or update eval coverage in [../evals/EVALS.md](../evals/EVALS.md)
+3. For a real site integration, write the reference inside the generated site harness under `sites/<site>/agent-harness/`
+4. Use [_template.md](./_template.md) only for shared examples or generic patterns
