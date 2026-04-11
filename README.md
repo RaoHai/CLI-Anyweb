@@ -4,11 +4,24 @@ Turn human-oriented websites into reusable, agent-native tools.
 
 `gui-agent-harness` is a standalone repository for turning ordinary websites into agent-usable tools through a structured CLI built around Vercel Labs `agent-browser`.
 
+English | [简体中文](/Y:/gui-agent-harness/README.zh-cn.md)
+
+One command line: make ordinary web software more usable by agents through structured browser control, reusable references, and replayable paths.
+
 It focuses on three layers:
 
 - a runnable browser harness built on `agent-browser`
 - skill-driven guidance for GUI navigation and decision making
 - per-site references and evaluation workflows for discovering best paths
+
+## Quick Links
+
+- [Quick Start](#quick-start)
+- [Why Not Just Use `agent-browser` Directly?](#why-not-just-use-agent-browser-directly)
+- [Repository Layout](#repository-layout)
+- [Roadmap](#roadmap)
+- [HARNESS.md](/Y:/gui-agent-harness/HARNESS.md)
+- [ROADMAP.md](/Y:/gui-agent-harness/ROADMAP.md)
 
 ## The Pain Point
 
@@ -33,6 +46,18 @@ What is missing is not just browser control. What is missing is a reusable, agen
 - No-barrier access: any website can become immediately operable by an agent through a structured CLI.
 - Seamless integration: no dedicated API, no visual-channel GUI driving, no codebase refactor, and no heavy adaptation layer required.
 - Future-oriented: with a single command, a web experience designed for humans can become a native tool for agents.
+
+## Why This Matters
+
+If the web is going to become a real execution environment for agents, success cannot depend on rediscovering the same UI path every time.
+
+The important shift is:
+
+- from one-off browser control
+- to reusable web workflows
+- to evaluated and improving site knowledge
+
+That is the layer this repository is trying to build.
 
 ## Why Not Just Use `agent-browser` Directly?
 
@@ -95,7 +120,14 @@ gui-agent-harness find Example
 gui-agent-harness get url
 ```
 
-The CLI now uses a flat command surface such as `open`, `snapshot`, `ls`, `click`, and `find` instead of the older grouped shell.
+The CLI uses a flat command surface such as `open`, `snapshot`, `ls`, `click`, and `find`.
+
+## What You Get
+
+- Flat agent-friendly browser commands
+- Snapshot-derived inspection and pathing
+- A place to store site references and reusable flow knowledge
+- A path toward replay, evaluation, and continuous improvement
 
 ## Repository Layout
 
@@ -114,6 +146,8 @@ The CLI now uses a flat command surface such as `open`, `snapshot`, `ls`, `click
 - add real site references beyond `example.com`
 - build the replay/eval loop for model-driven path discovery
 - expand backend-focused tests such as executable resolution, snapshot parsing, and path-to-ref translation
+
+For the fuller execution plan, see [ROADMAP.md](/Y:/gui-agent-harness/ROADMAP.md).
 
 ## Configuration
 
