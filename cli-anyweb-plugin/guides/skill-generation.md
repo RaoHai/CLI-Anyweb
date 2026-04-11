@@ -61,13 +61,13 @@ skill_path = generate_skill_file(
 
 SKILL.md is generated inside the Python package so it is installed with `pip install`:
 
-```
+```text
 <software>/
-鈹斺攢鈹€ agent-harness/
-    鈹斺攢鈹€ cli_anyweb/
-        鈹斺攢鈹€ <software>/
-            鈹斺攢鈹€ skills/
-                鈹斺攢鈹€ SKILL.md
+`- agent-harness/
+   `- cli_anyweb/
+      `- <software>/
+         `- skills/
+            `- SKILL.md
 ```
 
 ## Manual Generation

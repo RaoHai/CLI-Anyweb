@@ -1,4 +1,4 @@
-﻿"""Unit tests for cli-anything-anyweb 鈥?Core modules with mocked MCP backend.
+﻿"""Unit tests for cli-anyweb core modules with mocked backend.
 
 These tests use synthetic data and mock the MCP backend. No Chrome or DOMShell required.
 
@@ -14,7 +14,7 @@ from agent_harness.core import page, fs
 from agent_harness.utils import agent_browser_backend as backend
 
 
-# 鈹€鈹€ Session Tests 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+# Session Tests
 
 class TestSession:
     """Test Session state management."""
@@ -122,7 +122,7 @@ class TestSession:
         assert not status["daemon_mode"]
 
 
-# 鈹€鈹€ Page Module Tests 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+# Page Module Tests
 
 class TestPageModule:
     """Test page command functions."""
@@ -199,7 +199,7 @@ class TestPageModule:
         assert result["working_dir"] == "/main"
 
 
-# 鈹€鈹€ Filesystem Module Tests 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+# Filesystem Module Tests
 
 class TestFsModule:
     """Test filesystem command functions."""
@@ -360,7 +360,7 @@ class TestFsModule:
             mock_cd.assert_any_call("/", use_daemon=False)
 
 
-# 鈹€鈹€ Daemon Mode Tests 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+# Daemon Mode Tests
 
 class TestDaemonMode:
     """Test daemon mode state propagation."""

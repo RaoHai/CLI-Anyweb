@@ -4,7 +4,7 @@ Make any website more agent-usable through a structured CLI.
 
 `cli-anyweb` is a browser harness and plugin-oriented workflow for turning ordinary websites into reusable, agent-native command surfaces on top of Vercel Labs `agent-browser`.
 
-English | [绠€浣撲腑鏂嘳(./README.zh-cn.md)
+English | [????](./README.zh-cn.md)
 
 One command line: turn web software built for humans into reusable tools for agents through browser control, site references, replayable paths, and evaluation.
 
@@ -12,7 +12,7 @@ One command line: turn web software built for humans into reusable tools for age
 
 `cli-anyweb` combines three layers:
 
-- a generic browser harness built on `agent-browser`
+- a generic runtime layer built on `agent-browser`
 - a methodology for onboarding unknown websites and discovering reusable flows
 - a plugin structure so each site can define its own setup, references, and eval assets
 
@@ -24,6 +24,7 @@ One command line: turn web software built for humans into reusable tools for age
 - [Repository Layout](#repository-layout)
 - [Roadmap](#roadmap)
 - [cli-anyweb-plugin/HARNESS.md](./cli-anyweb-plugin/HARNESS.md)
+- [runtime/README.md](./runtime/README.md)
 - [ROADMAP.md](./ROADMAP.md)
 - [cli-anyweb-plugin](./cli-anyweb-plugin)
 
@@ -139,18 +140,19 @@ The CLI uses a flat command surface such as `open`, `snapshot`, `ls`, `click`, a
 ## Repository Layout
 
 - [setup.py](./setup.py)
+- [runtime/README.md](./runtime/README.md)
 - [agent_harness/README.md](./agent_harness/README.md)
 - [agent_harness/skills/SKILL.md](./agent_harness/skills/SKILL.md)
 - [agent_harness/skills/references](./agent_harness/skills/references)
 - [agent_harness/skills/evals](./agent_harness/skills/evals)
 - [agent_harness/tests/TEST.md](./agent_harness/tests/TEST.md)
 - [cli-anyweb-plugin](./cli-anyweb-plugin)
+- [runtime](./runtime)
 - [references](./references)
 - [cli-anyweb-plugin/HARNESS.md](./cli-anyweb-plugin/HARNESS.md)
 
 ## Roadmap
 
-- decide whether to rename the internal package directory from `agent_harness` to `cli_anyweb`
 - clean up remaining legacy naming around `CLI_ANYTHING_ANYWEB_*` and older filesystem-oriented wording
 - add real site references beyond `example.com`
 - build the replay/eval loop for model-driven path discovery
@@ -164,7 +166,8 @@ For the fuller execution plan, see [ROADMAP.md](./ROADMAP.md).
 - Preferred package name: `cli-anyweb`
 - Preferred CLI command: `cli-anyweb`
 - Preferred extra browser flag env var: `CLI_ANYWEB_AGENT_BROWSER_FLAGS`
-- Legacy internal package path remains `agent_harness` for now
+- Repository-level execution layer: `runtime/`
+- Current internal Python package path: `agent_harness`
 
 ## Why This Repo Exists
 
@@ -172,11 +175,9 @@ This repository started as a focused browser harness extracted from the larger `
 
 It is now being reshaped around a more specific goal:
 
-- provide a generic browser harness
+- provide a generic runtime layer
 - provide a plugin structure similar to `cli-anything-plugin`
 - let contributors turn arbitrary websites into reusable site-specific CLIs
-
-The Python package still lives in the root-level `agent_harness/` directory for now, even though the product-facing name is `cli-anyweb`.
 
 ## Attribution
 

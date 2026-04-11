@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Verify cli-anyweb plugin structure
 
 echo "Verifying cli-anyweb plugin structure..."
@@ -6,12 +6,11 @@ echo ""
 
 ERRORS=0
 
-# Check required files
 check_file() {
     if [ -f "$1" ]; then
-        echo "鉁?$1"
+        echo "[OK] $1"
     else
-        echo "鉁?$1 (MISSING)"
+        echo "[MISSING] $1"
         ERRORS=$((ERRORS + 1))
     fi
 }
@@ -33,27 +32,26 @@ check_file "scripts/setup-cli-anyweb.sh"
 echo ""
 echo "Checking plugin.json validity..."
 if python3 -c "import json; json.load(open('.claude-plugin/plugin.json'))" 2>/dev/null; then
-    echo "鉁?plugin.json is valid JSON"
+    echo "[OK] plugin.json is valid JSON"
 else
-    echo "鉁?plugin.json is invalid JSON"
+    echo "[FAIL] plugin.json is invalid JSON"
     ERRORS=$((ERRORS + 1))
 fi
 
 echo ""
 echo "Checking script permissions..."
 if [ -x "scripts/setup-cli-anyweb.sh" ]; then
-    echo "鉁?setup-cli-anyweb.sh is executable"
+    echo "[OK] setup-cli-anyweb.sh is executable"
 else
-    echo "鉁?setup-cli-anyweb.sh is not executable"
+    echo "[FAIL] setup-cli-anyweb.sh is not executable"
     ERRORS=$((ERRORS + 1))
 fi
 
 echo ""
-if [ $ERRORS -eq 0 ]; then
-    echo "鉁?All checks passed! Plugin is ready."
+if [ "$ERRORS" -eq 0 ]; then
+    echo "[OK] All checks passed! Plugin is ready."
     exit 0
 else
-    echo "鉁?$ERRORS error(s) found. Please fix before publishing."
+    echo "[FAIL] $ERRORS error(s) found. Please fix before publishing."
     exit 1
 fi
-

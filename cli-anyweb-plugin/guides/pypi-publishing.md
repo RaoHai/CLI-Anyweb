@@ -8,16 +8,16 @@ side-by-side in the same Python environment without conflicts.
 
 ## 1. Package Structure
 
-```
+```text
 agent-harness/
-鈹溾攢鈹€ setup.py
-鈹斺攢鈹€ cli_anyweb/           # NO __init__.py here (namespace package)
-    鈹斺攢鈹€ <software>/         # e.g., gimp, blender, audacity
-        鈹溾攢鈹€ __init__.py     # HAS __init__.py (regular sub-package)
-        鈹溾攢鈹€ <software>_cli.py
-        鈹溾攢鈹€ core/
-        鈹溾攢鈹€ utils/
-        鈹斺攢鈹€ tests/
+|- setup.py
+`- cli_anyweb/           # NO __init__.py here (namespace package)
+   `- <software>/        # e.g., gimp, blender, audacity
+      |- __init__.py     # HAS __init__.py (regular sub-package)
+      |- <software>_cli.py
+      |- core/
+      |- utils/
+      `- tests/
 ```
 
 The key rule: `cli_anyweb/` has **no** `__init__.py`. Each sub-package

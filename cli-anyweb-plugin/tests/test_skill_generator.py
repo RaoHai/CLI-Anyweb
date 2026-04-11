@@ -1,5 +1,5 @@
 ﻿"""
-Tests for skill_generator.py 鈥?SKILL.md generation for cli-anyweb harnesses.
+Tests for skill_generator.py - SKILL.md generation for cli-anyweb harnesses.
 
 Verifies metadata extraction, SKILL.md generation, and edge cases.
 
@@ -38,7 +38,7 @@ from skill_generator import (
 )
 
 
-# 鈹€鈹€鈹€ Fixtures 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+# Fixtures
 
 
 @pytest.fixture
@@ -108,7 +108,7 @@ def minimal_harness(tmp_path):
     return tmp_path
 
 
-# 鈹€鈹€鈹€ extract_cli_metadata Tests 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+# extract_cli_metadata Tests
 
 
 class TestExtractCliMetadata:
@@ -165,7 +165,7 @@ class TestExtractCliMetadata:
         assert "testapp" in metadata.skill_description.lower() or "Testapp" in metadata.skill_description
 
 
-# 鈹€鈹€鈹€ extract_version_from_setup Tests 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+# extract_version_from_setup Tests
 
 
 class TestExtractVersionFromSetup:
@@ -185,7 +185,7 @@ class TestExtractVersionFromSetup:
         assert extract_version_from_setup(setup_py) == "1.0.0"
 
 
-# 鈹€鈹€鈹€ extract_intro_from_readme Tests 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+# extract_intro_from_readme Tests
 
 
 class TestExtractIntroFromReadme:
@@ -206,7 +206,7 @@ class TestExtractIntroFromReadme:
         assert "Line two" in intro
 
 
-# 鈹€鈹€鈹€ generate_skill_md Tests 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+# generate_skill_md Tests
 
 
 class TestGenerateSkillMd:
@@ -286,7 +286,7 @@ class TestGenerateSkillMd:
         assert len(content) > 0
 
 
-# 鈹€鈹€鈹€ generate_skill_file Tests 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+# generate_skill_file Tests
 
 
 class TestGenerateSkillFile:
@@ -309,7 +309,7 @@ class TestGenerateSkillFile:
         assert Path(output).exists()
 
 
-# 鈹€鈹€鈹€ Edge Case Tests 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+# Edge Case Tests
 
 
 class TestEdgeCases:
