@@ -107,22 +107,6 @@ The CLI now uses a flat command surface such as `open`, `snapshot`, `ls`, `click
 - [agent_harness/tests/TEST.md](/Y:/gui-agent-harness/agent_harness/tests/TEST.md)
 - [HARNESS.md](/Y:/gui-agent-harness/HARNESS.md)
 
-## Project Status
-
-The repository currently provides:
-
-- a working `agent-browser`-backed harness
-- a flat top-level CLI surface centered on `open`, `snapshot`, `ls`, `click`, `type`, `get`, and `find`
-- an extensible skill and reference system for site-specific best practices
-- documentation scaffolding for automatic path discovery and evaluation
-
-Current implementation details:
-
-- workspace: `Y:\gui-agent-harness`
-- main CLI module: `agent_harness/gui_agent_harness_cli.py`
-- internal package path: `agent_harness`
-- runtime browser profile default: `.agent-browser-profile` in the project root
-
 ## Roadmap
 
 - decide whether to rename the internal package directory from `agent_harness` to `gui_agent_harness`
