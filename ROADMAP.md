@@ -2,7 +2,7 @@
 
 ## Goal
 
-`gui-agent-harness` is not trying to be only a browser control wrapper.
+`cli-anyweb` is not trying to be only a browser control wrapper.
 
 The long-term goal is to turn ordinary websites into reusable, agent-native tools:
 

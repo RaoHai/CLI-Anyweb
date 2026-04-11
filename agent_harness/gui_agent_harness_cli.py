@@ -1,30 +1,30 @@
 #!/usr/bin/env python3
-"""gui-agent-harness - a command-line interface for browser automation via agent-browser.
+"""cli-anyweb - a command-line interface for browser automation via agent-browser.
 
 This CLI uses a flat command surface that maps closely to browser actions while
 still exposing snapshot-tree inspection helpers for exploration.
 
 Usage:
     # Direct browser commands
-    gui-agent-harness open https://example.com
-    gui-agent-harness reload
-    gui-agent-harness back
-    gui-agent-harness forward
-    gui-agent-harness info
+    cli-anyweb open https://example.com
+    cli-anyweb reload
+    cli-anyweb back
+    cli-anyweb forward
+    cli-anyweb info
 
     # Snapshot inspection
-    gui-agent-harness snapshot
-    gui-agent-harness ls /
-    gui-agent-harness cat /heading[0]
-    gui-agent-harness find login
-    gui-agent-harness get url
+    cli-anyweb snapshot
+    cli-anyweb ls /
+    cli-anyweb cat /heading[0]
+    cli-anyweb find login
+    cli-anyweb get url
 
     # Actions
-    gui-agent-harness click @12
-    gui-agent-harness type @15 "hello"
+    cli-anyweb click @12
+    cli-anyweb type @15 "hello"
 
     # Interactive REPL
-    gui-agent-harness
+    cli-anyweb
 """
 
 import json
@@ -148,7 +148,7 @@ def handle_error(func):
 @click.option("--daemon", "use_daemon", is_flag=True, help="Use persistent daemon mode")
 @click.pass_context
 def cli(ctx, use_json, use_daemon):
-    """gui-agent-harness - browser automation harness via agent-browser."""
+    """cli-anyweb - browser automation harness via agent-browser."""
     global _json_output, _session, _availability_cached
     _json_output = use_json
 
@@ -381,7 +381,7 @@ def repl():
     global _repl_mode
     _repl_mode = True
 
-    skin = ReplSkin("gui-agent-harness", version="1.0.0")
+    skin = ReplSkin("cli-anyweb", version="1.0.0")
     skin.print_banner()
     pt_session = skin.create_prompt_session()
 

@@ -23,9 +23,9 @@
 ## Suggested Harness Commands
 
 ```bash
-gui-agent-harness open <url>
-gui-agent-harness --json ls /
-gui-agent-harness --json grep "<key text>"
+cli-anyweb open <url>
+cli-anyweb --json ls /
+cli-anyweb --json grep "<key text>"
 ```
 
 ## Common Failure Modes

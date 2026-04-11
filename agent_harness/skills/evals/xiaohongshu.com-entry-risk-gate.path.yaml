@@ -1,0 +1,28 @@
+site: xiaohongshu.com
+flow: detect_risk_gate_and_exit
+version: 1
+entry_url: https://www.xiaohongshu.com
+preconditions: []
+steps:
+  - action: open
+    target: https://www.xiaohongshu.com
+  - action: snapshot
+  - action: assert_text
+    target: "300012"
+  - action: assert_url_contains
+    target: "website-login/error"
+success:
+  page_type: risk_gate
+  contains_text:
+    - "300012"
+fallbacks:
+  - if: primary_code_missing
+    action: assert_url_contains
+    target: "website-login/error"
+  - if: url_check_inconclusive
+    action: inspect_page_shape
+    target: short_error_state_page
+output:
+  status: blocked
+  reason: site_entry_risk_gate
+  next_step: retry_from_reliable_network_and_validate_search_flow

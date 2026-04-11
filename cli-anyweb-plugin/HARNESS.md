@@ -1,17 +1,17 @@
-# Browser Harness: agent-browser Integration
+# cli-anyweb Plugin Harness
+
+This file is the source of truth for how to turn an arbitrary website into a reusable, site-specific CLI on top of `cli-anyweb`.
+
+It intentionally follows the role and layout of `cli-anything-plugin/HARNESS.md`, but the target here is the web:
+
+- `cli-anything` turns GUI applications into CLIs
+- `cli-anyweb` turns websites into reusable web CLIs for agents
 
 ## Purpose
 
-This harness provides browser automation using [Vercel Labs agent-browser](https://github.com/vercel-labs/agent-browser).
+This harness provides browser automation for `cli-anyweb` using [Vercel Labs agent-browser](https://github.com/vercel-labs/agent-browser).
 
 Its role is not only to expose browser control, but to give agents a structured operating surface for interacting with websites and gradually turning repeated web exploration into reusable workflow assets.
-
-Compared with the earlier browser harness lineage, this project now:
-
-- uses `agent-browser` as the backend
-- exposes a flat CLI command surface
-- reconstructs a snapshot-derived tree for inspection and pathing
-- aims to support references, replay, and evaluation over time
 
 ## Architecture
 
@@ -57,19 +57,15 @@ Internally:
 
 ## Synthetic Filesystem
 
-`agent-browser` gives us an accessibility snapshot and deterministic refs, but it does not expose a built-in hierarchical path tree in the same form as the older harness.
+`agent-browser` gives an accessibility snapshot and deterministic refs, but it does not expose the same inspectable hierarchy that the older harness lineage used.
 
-To preserve an inspectable and agent-friendly operating model, this repository reconstructs that tree locally.
-
-Flow:
+To preserve an agent-friendly operating model, this repository reconstructs a local tree:
 
 1. call `agent-browser snapshot --json`
 2. parse the snapshot text and refs map
 3. build an in-memory node tree
 4. assign stable-looking paths such as `/button[0]` or `/main[0]/link[2]`
 5. use those paths for `ls`, `cd`, `cat`, `grep`, and path-based `click` or `type`
-
-This keeps the harness ergonomic for agents while switching the underlying browser backend.
 
 ## Session State
 
@@ -87,19 +83,19 @@ Notes:
 - `daemon-start` and `daemon-stop` are lightweight local toggles
 - agent-browser already owns the real browser daemon lifecycle
 
-## Command Mapping
+## Plugin Output Contract
 
-| Harness command | Backend command |
-|---|---|
-| `open <url>` | `agent-browser open <url>` |
-| `reload` | `agent-browser reload` |
-| `back` | `agent-browser back` |
-| `forward` | `agent-browser forward` |
-| `ls` | `agent-browser snapshot --json` + local tree listing |
-| `cat` | `agent-browser snapshot --json` + local node lookup |
-| `grep` | `agent-browser snapshot --json` + local text search |
-| `click <path>` | `agent-browser click @ref` |
-| `type <path> <text>` | `agent-browser type @ref <text>` |
+Each site integration should aim to produce a small but reusable asset set:
+
+- a site setup entry point
+- a site profile
+- one or more flow references
+- one or more path artifacts
+- one or more eval cases
+- optional site wrappers for browser flags, auth prerequisites, or launch behavior
+
+The first valid integration for a new site does not need to be large.
+It does need to be replayable.
 
 ## Harness Method
 
@@ -143,8 +139,6 @@ The first successful onboarding should ideally produce:
 
 ### Onboarding Pipeline
 
-The first-contact workflow for an unknown site should follow a standard pipeline.
-
 #### 1. Open
 
 Inputs:
@@ -177,17 +171,9 @@ Goals:
 - identify likely high-value interaction surfaces
 - collect candidate stable anchors
 
-Useful early site categories include:
-
-- content consumption sites
-- search and information sites
-- form or back-office systems
-- e-commerce sites
-- community or feed-based sites
-
 #### 3. Generate Flow Hypotheses
 
-Before taking action, the agent should propose several candidate flows.
+Before taking action, propose several candidate flows.
 
 Examples:
 
@@ -240,6 +226,35 @@ After selecting a candidate flow, execute it and capture:
 
 This is the point where the first reusable site asset begins to exist.
 
+## Site-Specific Setup
+
+Some websites require browser settings that should not be hardcoded globally.
+
+Examples:
+
+- real user agent strings
+- custom browser flags
+- custom profile behavior
+- network or auth prerequisites
+
+For these sites, prefer per-site setup via:
+
+- plugin setup scripts
+- per-site environment files
+- wrapper commands that export site-specific flags before invoking the harness
+
+### Real UA Example
+
+For sites such as Xiaohongshu that may reject the default headless browser fingerprint, use:
+
+- `CLI_ANYWEB_AGENT_BROWSER_FLAGS`
+
+```bash
+export CLI_ANYWEB_AGENT_BROWSER_FLAGS='--user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"'
+```
+
+The exact flag support depends on `agent-browser`, but the harness forwards extra browser flags from this environment variable.
+
 ## Persisted Assets
 
 When an unknown site is first explored successfully, the result should not remain a one-off run.
@@ -247,7 +262,7 @@ It should be persisted as layered assets.
 
 ### 1. Site Profile
 
-This describes what the site is.
+Describes what the site is.
 
 Suggested contents:
 
@@ -261,7 +276,7 @@ Suggested contents:
 
 ### 2. Flow Reference
 
-This describes how a specific flow works.
+Describes how one real flow works.
 
 Suggested contents:
 
@@ -275,7 +290,7 @@ Suggested contents:
 
 ### 3. Replayable Path Artifact
 
-This describes how a machine should replay the flow.
+Describes how the machine should attempt replay.
 
 Suggested contents:
 
@@ -287,125 +302,62 @@ Suggested contents:
 
 ### 4. Eval Case
 
-This describes how the flow should be re-checked later.
+Describes how the saved flow should be checked later.
 
 Suggested contents:
 
 - flow id
-- entry point
-- input values
-- terminal expectations
-- scoreable assertions
-
-Together these assets let the second run begin from knowledge instead of from zero.
+- entry URL
+- inputs
+- expected terminal state
+- expected anchor matches
 
 ## Evaluation Model
 
-Evaluation should begin as soon as the first successful flow exists.
+Evaluation should focus on flows, not on vague whole-site correctness.
 
-At first, evaluation should not try to score the whole site.
-It should score one flow at a time.
+Each eval run should aim to answer:
 
-### Minimum Eval Structure
+- did the flow still succeed
+- how many steps did it take
+- did fallback trigger
+- did it land on the expected terminal page type
+- did expected anchors still appear
 
-Each flow should produce at least one eval case containing:
+The main point is not to prove the site is perfect.
+The main point is to know whether the saved flow still works, whether it got more expensive, and whether the failure mode changed.
 
-- `entry_url`
-- `flow_name`
-- `inputs`
-- expected terminal state
-- expected anchor or text checks
+## Recommended Plugin Commands
 
-Example shape:
+Keep the plugin-facing command set close to the upstream `cli-anything-plugin` shape:
 
-```yaml
-id: site_flow_001
-flow: open_first_content_detail
-entry_url: https://example.com
-inputs: {}
-expect:
-  page_type: detail
-  contains_text:
-    - comments
+- `/cli-anyweb <site-or-url>`
+- `/cli-anyweb:refine <site>`
+- `/cli-anyweb:test <site>`
+- `/cli-anyweb:validate <site>`
+- `/cli-anyweb:list`
+
+## Recommended Directory Shape
+
+```text
+cli-anyweb-plugin/
+├── .claude-plugin/
+├── commands/
+├── guides/
+├── scripts/
+├── templates/
+├── tests/
+├── HARNESS.md
+├── README.md
+├── QUICKSTART.md
+├── PUBLISHING.md
+├── repl_skin.py
+├── skill_generator.py
+└── verify-plugin.sh
 ```
 
-### Minimum Eval Metrics
+The point of this similarity is practical:
 
-The first useful metrics are:
-
-- `success`
-- `step_count`
-- `fallback_used`
-- `terminal_page_type`
-- `terminal_anchor_match`
-
-At the start, evaluation should answer:
-
-- can the flow still be completed
-- does it still land on the right page type
-- is it getting more expensive
-- is fallback becoming more common
-
-## Installation
-
-```bash
-pip install -e .
-npm install -g agent-browser
-agent-browser install
-```
-
-## Testing
-
-### Unit Tests
-
-- mock backend functions at the Python boundary
-- test path resolution and session behavior
-- avoid requiring a real browser where possible
-
-### E2E Tests
-
-- require `agent-browser`
-- opt in with `AGENT_BROWSER_E2E=1`
-- verify CLI startup, JSON output, status, and live interactions
-
-## Tradeoffs
-
-Benefits:
-
-- simpler runtime dependency model
-- official JSON output from the browser backend
-- richer future surface area: screenshots, semantic locators, sessions, and network tools
-- a cleaner path from one-off browser control toward reusable agent workflows
-
-Costs:
-
-- filesystem-like paths are synthesized, not backend-native
-- large pages may require repeated snapshots
-- path stability depends on accessibility snapshot structure
-- the accumulation layer for references and replay is still incomplete
-
-## Future Work
-
-- add snapshot caching to reduce repeated backend calls
-- expose more of `agent-browser`'s semantic locator and screenshot features
-- add higher-level workflow helpers for forms, extraction, and waiting
-- implement durable replay/eval loops for real site references
-- make path reuse a first-class default instead of a manual convention
-
-## Practical Principle
-
-For unknown sites, the first mission is not to solve the whole product.
-
-The first mission is to convert the site into something that is:
-
-- partially understood
-- partially replayable
-- partially evaluable
-- more reusable next time than it was this time
-
-That is the shortest path from browser automation to agent-native web infrastructure.
-
-## References
-
-- [vercel-labs/agent-browser](https://github.com/vercel-labs/agent-browser)
-- [CLI-Anything](https://github.com/HKUDS/CLI-Anything)
+- contributors can move between `cli-anything` and `cli-anyweb` without relearning the layout
+- command docs and SOP material have predictable homes
+- future plugin distribution can follow a familiar shape

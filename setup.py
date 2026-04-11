@@ -15,10 +15,10 @@ def read_readme():
 
 
 setup(
-    name="gui-agent-harness",
+    name="cli-anyweb",
     version="1.0.0",
     author="CLI Anything Contributors",
-    description="GUI agent harness built on Vercel Labs agent-browser",
+    description="Turn arbitrary websites into agent-usable CLIs built on Vercel Labs agent-browser",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/HKUDS/CLI-Anything",
@@ -43,7 +43,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "gui-agent-harness=agent_harness.gui_agent_harness_cli:main",
+            "cli-anyweb=agent_harness.gui_agent_harness_cli:main",
         ],
     },
     package_data={
@@ -56,7 +56,7 @@ setup(
     },
     include_package_data=True,
     zip_safe=False,
-    keywords="gui harness browser automation agent-browser ai-agent evals",
+    keywords="cli-anyweb website cli browser automation agent-browser ai-agent evals",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",

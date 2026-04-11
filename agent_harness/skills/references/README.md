@@ -13,6 +13,8 @@ Each reference should explain how to interact with a specific website or product
 ## Suggested Naming
 
 - `example.com.md`
+- `xiaohongshu.com-site-profile.md`
+- `xiaohongshu.com-entry-risk-gate.md`
 - `github.com-login.md`
 - `notion.so-editor.md`
 - `aws-console-s3.md`
@@ -29,7 +31,7 @@ Each reference should explain how to interact with a specific website or product
 
 ## Workflow
 
-1. Explore the site with `gui-agent-harness`
+1. Explore the site with `cli-anyweb`
 2. Identify the shortest reliable path
-3. Write a reference using [_template.md](Y:\CLI-Anything\CLI-anyweb\agent_harness\skills\references\_template.md)
-4. Add or update eval coverage in [../evals/EVALS.md](Y:\CLI-Anything\CLI-anyweb\agent_harness\skills\evals\EVALS.md)
+3. Write a reference using [_template.md](./_template.md)
+4. Add or update eval coverage in [../evals/EVALS.md](../evals/EVALS.md)

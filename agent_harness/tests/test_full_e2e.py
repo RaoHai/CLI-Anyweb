@@ -43,7 +43,7 @@ class TestDependencyChecks:
         """CLI should start successfully when agent-browser is available."""
         result = runner.invoke(cli, ["--help"])
         assert result.exit_code == 0
-        assert "gui-agent-harness" in result.output or "web automation" in result.output.lower()
+        assert "cli-anyweb" in result.output or "web automation" in result.output.lower()
 
 
 class TestPageCommands:
@@ -90,9 +90,9 @@ class TestDaemonMode:
         """Manual test: Start daemon, run commands, stop daemon.
 
         To run manually:
-            gui-agent-harness daemon-start
-            gui-agent-harness pwd
-            gui-agent-harness daemon-stop
+            cli-anyweb daemon-start
+            cli-anyweb pwd
+            cli-anyweb daemon-stop
         """
         pass
 

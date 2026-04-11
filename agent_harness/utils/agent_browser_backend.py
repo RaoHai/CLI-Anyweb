@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 from dataclasses import dataclass, field
@@ -33,7 +34,7 @@ class SnapshotNode:
 
 def _run_agent_browser(*args: str, expect_json: bool = True) -> dict[str, Any]:
     executable = _find_agent_browser()
-    command = [executable, *_default_agent_browser_flags()]
+    command = [executable, *_default_agent_browser_flags(), *_extra_agent_browser_flags()]
     if expect_json:
         command.append("--json")
     command.extend(args)
@@ -252,6 +253,13 @@ def _default_agent_browser_flags() -> list[str]:
     )
     Path(profile).mkdir(parents=True, exist_ok=True)
     return ["--profile", str(profile)]
+
+
+def _extra_agent_browser_flags() -> list[str]:
+    raw = (os.environ.get("CLI_ANYWEB_AGENT_BROWSER_FLAGS") or "").strip()
+    if not raw:
+        return []
+    return shlex.split(raw)
 
 
 def _env_path(name: str) -> Path | None:

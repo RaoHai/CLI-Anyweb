@@ -1,9 +1,9 @@
 ---
-name: "gui-agent-harness"
-description: "GUI agent harness built on agent-browser. Use harness commands, site references, and eval guidance to discover robust browser paths."
+name: "cli-anyweb"
+description: "Turn websites into agent-usable CLIs built on agent-browser. Use harness commands, site references, and eval guidance to discover robust browser paths."
 ---
 
-# gui-agent-harness
+# cli-anyweb
 
 Use this harness when you need a browser-oriented command interface that an agent can drive and improve over time.
 
@@ -25,15 +25,15 @@ This project is meant to:
 
 ## Preferred Commands
 
-- `gui-agent-harness open <url>`
-- `gui-agent-harness info`
-- `gui-agent-harness snapshot`
-- `gui-agent-harness ls [path]`
-- `gui-agent-harness cat [path]`
-- `gui-agent-harness grep <pattern> [path]`
-- `gui-agent-harness click <path-or-ref>`
-- `gui-agent-harness type <path-or-ref> <text>`
-- `gui-agent-harness status`
+- `cli-anyweb open <url>`
+- `cli-anyweb info`
+- `cli-anyweb snapshot`
+- `cli-anyweb ls [path]`
+- `cli-anyweb cat [path]`
+- `cli-anyweb grep <pattern> [path]`
+- `cli-anyweb click <path-or-ref>`
+- `cli-anyweb type <path-or-ref> <text>`
+- `cli-anyweb status`
 
 ## Agent Guidance
 
@@ -75,10 +75,10 @@ The intended loop is:
 ## Examples
 
 ```bash
-gui-agent-harness open https://example.com
-gui-agent-harness ls /
-gui-agent-harness grep "Learn more"
-gui-agent-harness --json status
+cli-anyweb open https://example.com
+cli-anyweb ls /
+cli-anyweb grep "Learn more"
+cli-anyweb --json status
 ```
 
 ## Security

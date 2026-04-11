@@ -1,0 +1,59 @@
+﻿#!/usr/bin/env bash
+# Verify cli-anyweb plugin structure
+
+echo "Verifying cli-anyweb plugin structure..."
+echo ""
+
+ERRORS=0
+
+# Check required files
+check_file() {
+    if [ -f "$1" ]; then
+        echo "鉁?$1"
+    else
+        echo "鉁?$1 (MISSING)"
+        ERRORS=$((ERRORS + 1))
+    fi
+}
+
+echo "Required files:"
+check_file ".claude-plugin/plugin.json"
+check_file "HARNESS.md"
+check_file "README.md"
+check_file "LICENSE"
+check_file "PUBLISHING.md"
+check_file "QUICKSTART.md"
+check_file "commands/cli-anyweb.md"
+check_file "commands/list.md"
+check_file "commands/refine.md"
+check_file "commands/test.md"
+check_file "commands/validate.md"
+check_file "scripts/setup-cli-anyweb.sh"
+
+echo ""
+echo "Checking plugin.json validity..."
+if python3 -c "import json; json.load(open('.claude-plugin/plugin.json'))" 2>/dev/null; then
+    echo "鉁?plugin.json is valid JSON"
+else
+    echo "鉁?plugin.json is invalid JSON"
+    ERRORS=$((ERRORS + 1))
+fi
+
+echo ""
+echo "Checking script permissions..."
+if [ -x "scripts/setup-cli-anyweb.sh" ]; then
+    echo "鉁?setup-cli-anyweb.sh is executable"
+else
+    echo "鉁?setup-cli-anyweb.sh is not executable"
+    ERRORS=$((ERRORS + 1))
+fi
+
+echo ""
+if [ $ERRORS -eq 0 ]; then
+    echo "鉁?All checks passed! Plugin is ready."
+    exit 0
+else
+    echo "鉁?$ERRORS error(s) found. Please fix before publishing."
+    exit 1
+fi
+

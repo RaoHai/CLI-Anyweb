@@ -1,6 +1,14 @@
-# gui-agent-harness
+# cli-anyweb runtime
 
-`gui-agent-harness` is a GUI agent harness built on [Vercel Labs agent-browser](https://github.com/vercel-labs/agent-browser). It provides a stable local runtime for browser automation plus skill/reference scaffolding for site-specific navigation best practices.
+`cli-anyweb` is a browser harness built on [Vercel Labs agent-browser](https://github.com/vercel-labs/agent-browser).
+
+This package provides the generic runtime layer:
+
+- browser commands
+- snapshot inspection
+- path resolution
+- session state
+- skill, reference, and eval scaffolding
 
 ## Install
 
@@ -22,7 +30,7 @@ agent-browser install
 Verify:
 
 ```bash
-gui-agent-harness --help
+cli-anyweb --help
 ```
 
 ## Harness Commands
@@ -30,18 +38,18 @@ gui-agent-harness --help
 One-shot commands:
 
 ```bash
-gui-agent-harness open https://example.com
-gui-agent-harness snapshot
-gui-agent-harness ls /
-gui-agent-harness grep "Login"
-gui-agent-harness click /paragraph[1]/link[0]
-gui-agent-harness --json status
+cli-anyweb open https://example.com
+cli-anyweb snapshot
+cli-anyweb ls /
+cli-anyweb grep "Login"
+cli-anyweb click /paragraph[1]/link[0]
+cli-anyweb --json status
 ```
 
 Interactive REPL:
 
 ```bash
-gui-agent-harness
+cli-anyweb
 ```
 
 Core commands:
@@ -56,29 +64,22 @@ Core commands:
 Every command supports `--json` for machine-readable output:
 
 ```bash
-gui-agent-harness --json ls /
+cli-anyweb --json ls /
 ```
 
 ## Environment
 
 Preferred environment variables:
 
+- `CLI_ANYWEB_AGENT_BROWSER_FLAGS`
 - `CLI_ANYTHING_ANYWEB_ALLOWED_SCHEMES`
 - `CLI_ANYTHING_ANYWEB_BLOCK_PRIVATE`
 
-Legacy `CLI_ANYTHING_BROWSER_*` variables are still accepted for compatibility.
-
 ## Skills And References
 
-- Core harness skill: [skills/SKILL.md](Y:\CLI-Anything\CLI-anyweb\agent_harness\skills\SKILL.md)
-- Site references: [skills/references](Y:\CLI-Anything\CLI-anyweb\agent_harness\skills\references)
-- Eval guidance: [skills/evals](Y:\CLI-Anything\CLI-anyweb\agent_harness\skills\evals)
-
-The intent is:
-
-- keep the harness generic
-- add per-site best practices as references
-- use those references to guide model-driven path selection and evaluation
+- Core harness skill: [skills/SKILL.md](./skills/SKILL.md)
+- Site references: [skills/references](./skills/references)
+- Eval guidance: [skills/evals](./skills/evals)
 
 ## Tests
 

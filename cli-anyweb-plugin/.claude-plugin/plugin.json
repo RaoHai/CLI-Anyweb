@@ -1,0 +1,8 @@
+﻿{
+  "name": "cli-anyweb",
+  "description": "Build reusable, site-specific web CLIs using the cli-anyweb harness methodology.",
+  "author": {
+    "name": "cli-anyweb contributors"
+  }
+}
+

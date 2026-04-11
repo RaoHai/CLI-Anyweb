@@ -7,7 +7,7 @@ Use a model plus the harness to discover the most reliable browser path for a ta
 ## Discovery Loop
 
 1. Start with a task definition
-2. Explore the target site with `gui-agent-harness`
+2. Explore the target site with `cli-anyweb`
 3. Save the observed anchors, labels, and intermediate states
 4. Ask a model to propose several candidate paths
 5. Replay each path against the live site

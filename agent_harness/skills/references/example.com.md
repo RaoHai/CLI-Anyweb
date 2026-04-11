@@ -23,11 +23,11 @@
 ## Suggested Harness Commands
 
 ```bash
-gui-agent-harness open https://example.com
-gui-agent-harness --json ls /
-gui-agent-harness --json cat /heading[0]
-gui-agent-harness --json grep "Learn more"
-gui-agent-harness --json click /paragraph[1]/link[0]
+cli-anyweb open https://example.com
+cli-anyweb --json ls /
+cli-anyweb --json cat /heading[0]
+cli-anyweb --json grep "Learn more"
+cli-anyweb --json click /paragraph[1]/link[0]
 ```
 
 ## Common Failure Modes
