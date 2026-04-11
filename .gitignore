@@ -12,3 +12,4 @@ build/
 venv/
 
 agent-browser.json
+.agent-browser-profile/
