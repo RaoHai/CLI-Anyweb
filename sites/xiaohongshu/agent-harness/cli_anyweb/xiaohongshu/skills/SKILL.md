@@ -1,3 +1,8 @@
+---
+name: "cli-anyweb-xiaohongshu"
+description: "Site harness for xiaohongshu (小红书). Use when working on xiaohongshu tasks: home feed, search (--type all|video|notes|users), open-note (--extract), login, publish, notifications, profile."
+---
+
 # cli-anyweb-xiaohongshu Skill
 
 Use this site harness when working on xiaohongshu.

@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import json
+import urllib.request
 from pathlib import Path
 from urllib.parse import quote
 
@@ -190,8 +191,9 @@ def _parse_search_cards(snap: str, refs: dict | None = None) -> list[dict]:
             if (i + 1 < n and "image" in lines[i + 1] and
                     len(lines[i + 1]) - len(lines[i + 1].lstrip()) == ind + 2):
                 title = author = likes = ""
-                # Extract note ID from cover ref href (via snapshot refs dict)
+                # Extract note ID and xsec_token from cover ref href (via snapshot refs dict)
                 note_id = ""
+                xsec_token = ""
                 cover_ref_m = re.search(r"\[ref=([^\]]+)\]", line)
                 if cover_ref_m and refs:
                     ref_data = refs.get(cover_ref_m.group(1)) or {}
@@ -199,6 +201,9 @@ def _parse_search_cards(snap: str, refs: dict | None = None) -> list[dict]:
                     m = re.search(r"/(?:explore|search_result)/([a-zA-Z0-9]+)", href)
                     if m:
                         note_id = m.group(1)
+                    xt = re.search(r"[?&]xsec_token=([^&]+)", href)
+                    if xt:
+                        xsec_token = xt.group(1)
                 j = i + 2
                 _advanced = False
                 while j < n:
@@ -237,13 +242,13 @@ def _parse_search_cards(snap: str, refs: dict | None = None) -> list[dict]:
                                             break
                     j += 1
                     if title and author and likes:
-                        results.append({"title": title, "author": author, "likes": likes, "note_id": note_id})
+                        results.append({"title": title, "author": author, "likes": likes, "note_id": note_id, "xsec_token": xsec_token})
                         i = j
                         _advanced = True
                         break
                 else:
                     if title:
-                        results.append({"title": title, "author": author, "likes": likes, "note_id": note_id})
+                        results.append({"title": title, "author": author, "likes": likes, "note_id": note_id, "xsec_token": xsec_token})
                 if not _advanced:
                     i += 1
                 continue
@@ -266,11 +271,13 @@ def _print_results_table(cards: list[dict]) -> None:
     click.echo("─" * (W_ID + W_TITLE + W_AUTHOR + W_LIKES + 6))
     for card in cards:
         nid = card.get("note_id") or "-"
+        xt = card.get("xsec_token") or ""
         click.echo(
             _cjk_ljust(_cjk_trunc(nid, W_ID), W_ID) + "  "
             + _cjk_ljust(_cjk_trunc(card["title"], W_TITLE), W_TITLE) + "  "
             + _cjk_ljust(_cjk_trunc(card["author"], W_AUTHOR), W_AUTHOR) + "  "
             + card["likes"].rjust(W_LIKES)
+            + (f"  xsec={xt}" if xt else "")
         )
 
 
@@ -285,11 +292,11 @@ def _extract_note_ids_from_js() -> list[str]:
         "var r=[];"
         "var aa=document.links;"
         "for(var i=0;i<aa.length&&r.length<60;i++){"
-        "var h=aa[i].pathname;"
-        "if(h.indexOf('/search_result/')===0){"
-        "var id=h.slice(15);"
+        "var p=aa[i].pathname;"
+        "var id=null;"
+        "if(p.indexOf('/search_result/')===0)id=p.slice(15);"
+        "else if(p.indexOf('/explore/')===0)id=p.slice(9);"
         "if(id&&r.indexOf(id)<0)r.push(id);"
-        "}"
         "}"
         "r.join('|')"
     )
@@ -303,6 +310,41 @@ def _extract_note_ids_from_js() -> list[str]:
         return [nid for nid in raw.split("|") if nid]
     except Exception:
         return []
+
+
+def _extract_note_xsec_tokens_from_js() -> dict[str, str]:
+    """Return {note_id: xsec_token} for search-result note links on the current page.
+
+    Xiaohongshu search result covers link to /search_result/<noteId>?xsec_token=...
+    """
+    script = (
+        "var r={};"
+        "var aa=document.links;"
+        "for(var i=0;i<aa.length;i++){"
+        "var p=aa[i].pathname;"
+        "var q=aa[i].search;"
+        "var id=null;"
+        "if(p.indexOf('/search_result/')===0)id=p.slice(15);"
+        "else if(p.indexOf('/explore/')===0)id=p.slice(9);"
+        "if(id){"
+        "var m=q.match(/[?&]xsec_token=([^&]+)/);"
+        "if(m&&!r[id])r[id]=decodeURIComponent(m[1]);"
+        "}"
+        "}"
+        "JSON.stringify(r)"
+    )
+    try:
+        raw = _get_backend().eval_js(script).get("output", "").strip()
+        if not raw:
+            return {}
+        if raw.startswith('"') and raw.endswith('"'):
+            raw = json.loads(raw)
+        data = json.loads(raw)
+        if isinstance(data, str):
+            data = json.loads(data)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
 
 
 def _echo_current_url() -> str:
@@ -334,7 +376,10 @@ def _extract_note_detail(html: str) -> dict:
     comment_count = _first(r"\"commentCount\":\"([^\"]*)\"")
     image_defaults = _all(r"\"urlDefault\":\"([^\"]+)\"")
     image_previews = _all(r"\"urlPre\":\"([^\"]+)\"")
-    video_urls = _all(r"\"url\":\"(http[^\"]+\\.mp4[^\"]*)\"")
+    video_urls = _all(r"\"masterUrl\":\"(http[^\"]+\.mp4[^\"]*)\"")
+    if not video_urls:
+        # fallback: older notes may use a plain "url" field
+        video_urls = _all(r"\"url\":\"(http[^\"]+\.mp4[^\"]*)\"")
 
     def _clean(value: str) -> str:
         return (
@@ -364,7 +409,12 @@ def _extract_note_detail_from_state() -> dict:
         return {}
     try:
         data = json.loads(raw)
+        # eval_js on Windows may double-serialise: unwrap if result is a string
+        if isinstance(data, str):
+            data = json.loads(data)
     except json.JSONDecodeError:
+        return {}
+    if not isinstance(data, dict):
         return {}
     first = next(iter(data.values()), {})
     note = first.get("note") if isinstance(first, dict) else {}
@@ -372,13 +422,27 @@ def _extract_note_detail_from_state() -> dict:
     images = note.get("imageList", []) if isinstance(note, dict) else []
     image_default = [img.get("urlDefault", "") for img in images if isinstance(img, dict)]
     image_pre = [img.get("urlPre", "") for img in images if isinstance(img, dict)]
+    # Extract video masterUrls from note.video.media.stream.h264[]
+    video = note.get("video", {}) if isinstance(note, dict) else {}
+    video_urls = []
+    if isinstance(video, dict):
+        media = video.get("media", {})
+        if isinstance(media, dict):
+            stream = media.get("stream", {})
+            if isinstance(stream, dict):
+                h264 = stream.get("h264", [])
+                video_urls = [
+                    s.get("masterUrl", "")
+                    for s in h264
+                    if isinstance(s, dict) and s.get("masterUrl")
+                ]
     return {
         "title": note.get("title", ""),
         "desc": note.get("desc", ""),
         "commentCount": interact.get("commentCount", ""),
         "imageDefaultUrls": image_default,
         "imagePreviewUrls": image_pre,
-        "videoUrls": [],
+        "videoUrls": video_urls,
     }
 
 
@@ -388,6 +452,121 @@ def _build_note_url(note_url: str | None, note_id: str | None, xsec_token: str |
     if xsec_token:
         return f"https://www.xiaohongshu.com/explore/{note_id}?xsec_token={xsec_token}"
     return f"https://www.xiaohongshu.com/explore/{note_id}"
+
+
+# ---------------------------------------------------------------------------
+# Shared helpers for note-* commands
+# ---------------------------------------------------------------------------
+
+def _open_note_if_needed(
+    note_url: str | None, note_id: str | None, xsec_token: str | None
+) -> None:
+    """Navigate to the note only when a URL/ID is supplied; otherwise keep the current page."""
+    if note_url or note_id:
+        _open(_build_note_url(note_url, note_id, xsec_token))
+        _get_backend().wait_ms(1500)
+
+
+def _get_note_detail() -> dict:
+    """Return parsed noteDetailMap from the current page, raising ClickException on failure."""
+    html = _get_html()
+    if html:
+        data = _extract_note_detail(html)
+        if data:
+            return data
+    try:
+        data = _extract_note_detail_from_state()
+        if data:
+            return data
+    except Exception:
+        pass
+    raise click.ClickException("No noteDetailMap found in HTML or state")
+
+
+_DOWNLOAD_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/146.0.0.0 Safari/537.36"
+)
+
+
+def _download_file(url: str, dest: Path, referer: str = "https://www.xiaohongshu.com") -> None:
+    """Download *url* to *dest* with browser-like headers to avoid CDN 403s."""
+    req = urllib.request.Request(url, headers={
+        "User-Agent": _DOWNLOAD_UA,
+        "Referer": referer,
+    })
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        dest.write_bytes(resp.read())
+
+
+def _safe_filename(title: str, max_len: int = 40) -> str:
+    """Sanitise a note title for use as a filename fragment."""
+    safe = re.sub(r'[^\w\u4e00-\u9fff]+', '_', title).strip('_')
+    return safe[:max_len] or "note"
+
+
+def _parse_comments_from_snapshot(snap: str, limit: int = 20) -> list[dict]:
+    """Extract visible comments from an accessibility-tree snapshot.
+
+    Heuristic: scan listitem blocks; each comment item has an author link
+    followed by a non-trivial StaticText body.  Tries to start from the
+    comment section heading ("评论") to skip the note header area.
+    """
+    lines = snap.splitlines()
+    n = len(lines)
+    nav = frozenset({
+        "发现", "直播", "发布", "通知", "我", "登录",
+        "创作中心", "业务合作", "更多", "搜索小红书",
+    })
+    results: list[dict] = []
+
+    # Seek the comment-section heading so we skip the note title/author block.
+    start = 0
+    for idx, line in enumerate(lines):
+        if "评论" in line and ("StaticText" in line or "heading" in line.lower()):
+            start = idx
+            break
+
+    i = start
+    while i < n and len(results) < limit:
+        line = lines[i]
+        if "listitem" not in line:
+            i += 1
+            continue
+
+        ind = len(line) - len(line.lstrip())
+        author = ""
+        content = ""
+        j = i + 1
+        while j < n:
+            jl = lines[j]
+            ji = len(jl) - len(jl.lstrip())
+            if ji <= ind:
+                break
+
+            if not author and 'link "' in jl:
+                m = re.search(r'link "([^"]+)"', jl)
+                if m and m.group(1) not in nav:
+                    author = m.group(1)
+
+            # Collect content only after we have an author (avoids the note title).
+            if author and not content and 'StaticText "' in jl:
+                m = re.search(r'StaticText "([^"]+)"', jl)
+                if m:
+                    text = m.group(1)
+                    if (text != author
+                            and len(text) > 1
+                            and text not in nav
+                            and not re.fullmatch(r'[\d万千百]+', text)):
+                        content = text
+            j += 1
+
+        if author and content:
+            results.append({"nickname": author, "content": content})
+        i += 1
+
+    return results
 
 
 @click.group()
@@ -429,6 +608,12 @@ def search(query: str, result_type: str) -> None:
         for i, card in enumerate(cards):
             if not card.get("note_id") and i < len(js_ids):
                 card["note_id"] = js_ids[i]
+    # Fill in xsec_tokens from /explore/ links on the page
+    xsec_map = _extract_note_xsec_tokens_from_js()
+    if xsec_map:
+        for card in cards:
+            if not card.get("xsec_token") and card.get("note_id"):
+                card["xsec_token"] = xsec_map.get(card["note_id"], "")
     _print_results_table(cards)
 
 
@@ -498,6 +683,150 @@ def profile() -> None:
     url = _echo_current_url()
     if url and "creator.xiaohongshu.com" in url:
         click.echo("Warning: profile appears to route to creator flow")
+
+
+# ---------------------------------------------------------------------------
+# Note detail commands
+# ---------------------------------------------------------------------------
+
+_NOTE_URL_OPTIONS = [
+    click.option("--url", "note_url", required=False, help="Full note URL"),
+    click.option("--note-id", "note_id", required=False, help="Note ID"),
+    click.option("--xsec-token", "xsec_token", required=False, help="xsec token"),
+]
+
+
+def _add_note_url_options(cmd):
+    for opt in reversed(_NOTE_URL_OPTIONS):
+        cmd = opt(cmd)
+    return cmd
+
+
+@site_cli.command("note-content")
+@click.option("--url", "note_url", required=False, help="Full note URL")
+@click.option("--note-id", "note_id", required=False, help="Note ID")
+@click.option("--xsec-token", "xsec_token", required=False, help="xsec token")
+@click.option("--json", "as_json", is_flag=True, default=False, help="Output raw JSON")
+def note_content(note_url: str | None, note_id: str | None, xsec_token: str | None, as_json: bool) -> None:
+    """Display note title, description, comment count, and media URLs."""
+    _open_note_if_needed(note_url, note_id, xsec_token)
+    data = _get_note_detail()
+    if as_json:
+        click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+        return
+    click.echo(f"标题: {data.get('title', '')}")
+    desc = data.get("desc", "")
+    click.echo(f"正文: {desc[:300]}{'…' if len(desc) > 300 else ''}")
+    click.echo(f"评论数: {data.get('commentCount', '-')}")
+    imgs = data.get("imageDefaultUrls", [])
+    vids = data.get("videoUrls", [])
+    click.echo(f"图片: {len(imgs)} 张")
+    for i, u in enumerate(imgs, 1):
+        click.echo(f"  [{i}] {u}")
+    click.echo(f"视频: {len(vids)} 个")
+    for i, u in enumerate(vids, 1):
+        click.echo(f"  [{i}] {u}")
+
+
+@site_cli.command("note-comments")
+@click.option("--url", "note_url", required=False, help="Full note URL")
+@click.option("--note-id", "note_id", required=False, help="Note ID")
+@click.option("--xsec-token", "xsec_token", required=False, help="xsec token")
+@click.option("--count", default=20, show_default=True, help="Max number of comments to show")
+@click.option("--json", "as_json", is_flag=True, default=False, help="Output raw JSON")
+def note_comments(
+    note_url: str | None, note_id: str | None, xsec_token: str | None,
+    count: int, as_json: bool,
+) -> None:
+    """List visible comments from a note detail page."""
+    _open_note_if_needed(note_url, note_id, xsec_token)
+    _get_backend().wait_ms(2000)  # let comment section render
+    snap_data = _get_backend().snapshot()
+    snap = snap_data.get("snapshot", "")
+    comments = _parse_comments_from_snapshot(snap, limit=count)
+    if as_json:
+        click.echo(json.dumps(comments, ensure_ascii=False, indent=2))
+        return
+    if not comments:
+        click.echo("(no comments found — page may require login or comments haven't loaded)")
+        return
+    W_NO, W_NICK, W_CONTENT = 4, 14, 44
+    header = (
+        _cjk_ljust("No.", W_NO) + "  "
+        + _cjk_ljust("昵称", W_NICK) + "  "
+        + "内容"
+    )
+    click.echo(header)
+    click.echo("─" * (W_NO + W_NICK + W_CONTENT + 4))
+    for i, c in enumerate(comments, 1):
+        click.echo(
+            _cjk_ljust(str(i), W_NO) + "  "
+            + _cjk_ljust(_cjk_trunc(c["nickname"], W_NICK), W_NICK) + "  "
+            + _cjk_trunc(c["content"], W_CONTENT)
+        )
+
+
+@site_cli.command("note-download-images")
+@click.option("--url", "note_url", required=False, help="Full note URL")
+@click.option("--note-id", "note_id", required=False, help="Note ID")
+@click.option("--xsec-token", "xsec_token", required=False, help="xsec token")
+@click.option("--output-dir", "-o", default=".", show_default=True, help="Directory to save images")
+@click.option("--preview", is_flag=True, default=False, help="Download preview size instead of full resolution")
+def note_download_images(
+    note_url: str | None, note_id: str | None, xsec_token: str | None,
+    output_dir: str, preview: bool,
+) -> None:
+    """Download all images from a note to a local directory."""
+    _open_note_if_needed(note_url, note_id, xsec_token)
+    data = _get_note_detail()
+    key = "imagePreviewUrls" if preview else "imageDefaultUrls"
+    urls = data.get(key, [])
+    if not urls:
+        raise click.ClickException("No images found in note")
+    out_dir = Path(output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    safe_title = _safe_filename(data.get("title", ""))
+    failed = 0
+    for i, url in enumerate(urls, 1):
+        path_part = url.split("?")[0].rsplit("/", 1)[-1]
+        ext = path_part.rsplit(".", 1)[-1] if "." in path_part else "jpg"
+        dest = out_dir / f"{safe_title}_{i:02d}.{ext}"
+        try:
+            _download_file(url, dest)
+            click.echo(f"[{i}/{len(urls)}] {dest.name}")
+        except Exception as exc:
+            click.echo(f"[{i}/{len(urls)}] FAILED: {exc}", err=True)
+            failed += 1
+    if failed:
+        click.echo(f"{failed}/{len(urls)} downloads failed", err=True)
+
+
+@site_cli.command("note-download-video")
+@click.option("--url", "note_url", required=False, help="Full note URL")
+@click.option("--note-id", "note_id", required=False, help="Note ID")
+@click.option("--xsec-token", "xsec_token", required=False, help="xsec token")
+@click.option("--output-dir", "-o", default=".", show_default=True, help="Directory to save the video")
+@click.option("--index", default=0, show_default=True, help="Which video to download (0 = first)")
+def note_download_video(
+    note_url: str | None, note_id: str | None, xsec_token: str | None,
+    output_dir: str, index: int,
+) -> None:
+    """Download the video from a note to a local directory."""
+    _open_note_if_needed(note_url, note_id, xsec_token)
+    data = _get_note_detail()
+    urls = data.get("videoUrls", [])
+    if not urls:
+        raise click.ClickException("No video found in note (image-only post?)")
+    if index >= len(urls):
+        raise click.ClickException(f"--index {index} out of range; note has {len(urls)} video(s)")
+    url = urls[index]
+    out_dir = Path(output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    safe_title = _safe_filename(data.get("title", ""))
+    dest = out_dir / f"{safe_title}.mp4"
+    click.echo(f"Downloading video → {dest}")
+    _download_file(url, dest)
+    click.echo(f"Saved: {dest} ({dest.stat().st_size // 1024} KB)")
 
 
 def main():
