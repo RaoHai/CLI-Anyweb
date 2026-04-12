@@ -569,6 +569,70 @@ def _parse_comments_from_snapshot(snap: str, limit: int = 20) -> list[dict]:
     return results
 
 
+def _get_qr_src() -> str:
+    """Extract QR code image src from the current login modal via eval_js."""
+    script = (
+        "var img=document.querySelector('.qrcode-img');"
+        "var cvs=document.querySelector('.qrcode-img-box canvas');"
+        "img?img.src:(cvs?cvs.toDataURL():'')"
+    )
+    raw = _get_backend().eval_js(script).get("output", "").strip()
+    if raw.startswith('"') and raw.endswith('"'):
+        try:
+            raw = json.loads(raw)
+        except Exception:
+            raw = raw[1:-1]
+    return raw or ""
+
+
+def _fetch_image_bytes(src: str) -> bytes:
+    """Fetch image bytes from a data: URI or an HTTP URL."""
+    if src.startswith("data:"):
+        import base64
+        _, b64 = src.split(",", 1)
+        return base64.b64decode(b64)
+    req = urllib.request.Request(
+        src,
+        headers={"User-Agent": _DOWNLOAD_UA, "Referer": "https://www.xiaohongshu.com/"},
+    )
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        return resp.read()
+
+
+def _render_qr_terminal(img_bytes: bytes) -> None:
+    """Render a QR code image as Unicode half-block art with ANSI colours."""
+    from PIL import Image
+    import io
+
+    img = Image.open(io.BytesIO(img_bytes)).convert("L")
+    TARGET_W = 42
+    w, h = img.size
+    new_h = max(1, round(h * TARGET_W / w))
+    img = img.resize((TARGET_W, new_h), Image.NEAREST)
+    pix = img.load()
+
+    WB = "\033[107m"  # bright-white background
+    BF = "\033[30m"   # black foreground
+    R  = "\033[0m"
+
+    lines = []
+    for y in range(0, new_h, 2):
+        row = WB + BF
+        for x in range(TARGET_W):
+            top = pix[x, y] < 128
+            bot = pix[x, y + 1] < 128 if y + 1 < new_h else False
+            if top and bot:
+                row += "█"
+            elif top:
+                row += "▀"
+            elif bot:
+                row += "▄"
+            else:
+                row += " "
+        lines.append(row + R)
+    click.echo("\n".join(lines))
+
+
 @click.group()
 def site_cli() -> None:
     """xiaohongshu site-specific commands."""
@@ -645,14 +709,63 @@ def open_note(note_url: str | None, note_id: str | None, xsec_token: str | None,
 
 
 @site_cli.command("login")
-def login() -> None:
-    """Open home and attempt to click the login entry."""
+@click.option(
+    "--save", "save_path",
+    default=None,
+    help="同时把 QR 码保存为 PNG（不指定路径则存 ./xhs_qr.png）",
+)
+def login(save_path: str | None) -> None:
+    """Display QR code for app-scan login; polls until login is detected."""
     _open("https://www.xiaohongshu.com/explore")
+    _get_backend().wait_ms(2000)
+
+    snap = _get_backend().snapshot().get("snapshot", "")
+    if "登录" not in snap:
+        click.echo("已登录。")
+        return
+
     try:
         _click_first("登录")
-        _echo_current_url()
-    except click.ClickException as exc:
-        click.echo(f"Login entry not found: {exc}")
+    except click.ClickException:
+        raise click.ClickException("未找到登录入口（当前页面可能已登录）")
+    _get_backend().wait_ms(2000)
+
+    last_src: str | None = None
+    for _round in range(10):          # 最多 10 轮 × ~3 分钟 = 30 分钟
+        src = _get_qr_src()
+        if not src:
+            raise click.ClickException("未在登录弹窗中找到 QR 码元素")
+
+        if src != last_src:
+            last_src = src
+            try:
+                img_bytes = _fetch_image_bytes(src)
+            except Exception as exc:
+                raise click.ClickException(f"下载 QR 码失败: {exc}")
+
+            _render_qr_terminal(img_bytes)
+
+            if save_path is not None:
+                dest = Path(save_path) if save_path else Path("xhs_qr.png")
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_bytes(img_bytes)
+                click.echo(f"QR 码已保存: {dest}")
+
+            click.echo("用小红书 App 扫描上方二维码  (等待中…  Ctrl-C 退出)")
+
+        # Poll every 2 s for up to ~3 minutes
+        for _ in range(90):
+            _get_backend().wait_ms(2000)
+            snap = _get_backend().snapshot().get("snapshot", "")
+            if "登录" not in snap:
+                click.echo("登录成功！")
+                return
+            if "已扫码" in snap or "确认登录" in snap:
+                click.echo("已扫码，请在手机上确认…")
+
+        click.echo("二维码已过期，正在刷新…")
+
+    click.echo("登录超时（30 分钟）。")
 
 
 @site_cli.command("publish")
