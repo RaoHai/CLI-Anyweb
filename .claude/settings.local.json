@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(xargs -I{} cat ~/.claude/plugins/marketplaces/claude-plugins-official/plugins/{}/plugin.json)",
+      "Bash(cat ~/.claude/plugins/marketplaces/claude-plugins-official/plugins/skill-creator/skills/*.md)",
+      "Bash(xargs -I{} head -10 {})",
+      "Bash(echo \"exit:$?\")",
+      "Bash(ls -la \"Y:/CLI-anyweb/sites/xiaohongshu/agent-harness/\"*联系*)",
+      "Bash(ls *.jpg)",
+      "Bash(python3 -c ':*)",
+      "Bash(python3:*)"
     ]
   }
 }
